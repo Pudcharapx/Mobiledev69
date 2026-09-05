@@ -1,0 +1,10 @@
+[project]
+name = "mobiledev-backend2"
+version = "0.1.0"
+description = "OpenID Connect provider for Mobile Development"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "django>=5.2.17",
+    "django-oidc-provider>=0.9.0",
+]
