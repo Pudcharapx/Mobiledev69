@@ -72,6 +72,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://localhost:50000",
     "http://127.0.0.1:50000",
+    "http://localhost:50001",
+    "http://127.0.0.1:50001",
 ]
 
 ROOT_URLCONF = 'config.urls'

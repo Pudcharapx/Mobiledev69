@@ -8,8 +8,11 @@ class Backend1App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Backend 1 JWT',
-        theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+        title: 'Week 14 Demo',
+        theme: ThemeData(
+          colorSchemeSeed: Colors.indigo,
+          useMaterial3: true,
+        ),
         home: const LoginPage(),
       );
 }
@@ -23,11 +26,15 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   static const _apiBaseUrl = 'http://127.0.0.1:8000';
+
   final _username = TextEditingController();
   final _password = TextEditingController();
   final _dio = Dio();
+
   String? _accessToken;
-  String _message = 'Sign in with a Backend 1 Django account.';
+  String? _refreshToken;
+
+  String _message = '';
   List<dynamic> _bookings = [];
   bool _loading = false;
 
@@ -42,42 +49,144 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _loading = true;
       _message = 'Signing in…';
+      _accessToken = null;
+      _refreshToken = null;
+      _bookings = [];
     });
+
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '$_apiBaseUrl/api/token/',
-        data: {'username': _username.text, 'password': _password.text},
+        data: {
+          'username': _username.text,
+          'password': _password.text,
+        },
       );
-      _accessToken = response.data!['access'] as String;
-      setState(() => _message = 'Signed in. Access token received.');
+
+      final data = response.data;
+
+      if (data == null) {
+        setState(() {
+          _message = 'Sign-in failed: Empty response from server.';
+        });
+        return;
+      }
+
+      setState(() {
+        _accessToken = data['access'] as String?;
+        _refreshToken = data['refresh'] as String?;
+
+        if (_accessToken != null && _refreshToken != null) {
+          _message = 'Signed in. Access token and refresh token received.';
+        } else if (_accessToken != null) {
+          _message = 'Signed in. Access token received, but refresh token was not found.';
+        } else {
+          _message = 'Sign-in failed: Access token was not found.';
+        }
+      });
+
       await _loadBookings();
     } on DioException catch (error) {
-      setState(() => _message =
-          'Sign-in failed: ${error.response?.statusCode ?? error.message}');
+      setState(() {
+        _message =
+            'Sign-in failed: ${error.response?.statusCode ?? error.message}';
+      });
+    } catch (error) {
+      setState(() {
+        _message = 'Sign-in failed: $error';
+      });
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
   Future<void> _loadBookings() async {
     if (_accessToken == null) return;
+
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '$_apiBaseUrl/api/bookings/',
-        options: Options(headers: {'Authorization': 'Bearer $_accessToken'}),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $_accessToken',
+          },
+        ),
       );
+
+      final data = response.data;
+
+      if (data == null) {
+        setState(() {
+          _message = 'Could not load bookings: Empty response from server.';
+        });
+        return;
+      }
+
       setState(() {
-        _bookings = response.data!['bookings'] as List<dynamic>;
+        _bookings = data['bookings'] as List<dynamic>;
         _message = 'Loaded protected bookings successfully.';
       });
     } on DioException catch (error) {
-      setState(() => _message = 'Could not load bookings: ${error.message}');
+      setState(() {
+        _message = 'Could not load bookings: ${error.message}';
+      });
+    } catch (error) {
+      setState(() {
+        _message = 'Could not load bookings: $error';
+      });
     }
+  }
+
+  Widget _buildTokenCard({
+    required String title,
+    required String? token,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                ),
+              ),
+              child: SelectableText(
+                token ?? 'ยังไม่มี Token',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Frontend 1 · JWT')),
+        appBar: AppBar(
+          title: const Text('Frontend 1 · JWT'),
+        ),
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
@@ -86,26 +195,65 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 TextField(
                   controller: _username,
-                  decoration: const InputDecoration(labelText: 'Username'),
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _password,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: _loading ? null : _signIn,
-                  child: Text(_loading ? 'Please wait…' : 'Sign in'),
+                  child: Text(
+                    _loading ? 'Please wait…' : 'Sign in',
+                  ),
                 ),
                 const SizedBox(height: 20),
-                Text(_message),
+
+                // Message
+                Text(
+                  _message,
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Access Token
+                if (_accessToken != null)
+                  _buildTokenCard(
+                    title: 'Access Token',
+                    token: _accessToken,
+                  ),
+
+                // Refresh Token
+                if (_refreshToken != null)
+                  _buildTokenCard(
+                    title: 'Refresh Token',
+                    token: _refreshToken,
+                  ),
+
+                const SizedBox(height: 8),
+
+                // Bookings
                 for (final booking in _bookings)
                   Card(
                     child: ListTile(
-                      title: Text(booking['destination_name'] as String),
-                      subtitle: Text('฿${booking['price']}'),
+                      title: Text(
+                        booking['destination_name'] as String,
+                      ),
+                      subtitle: Text(
+                        '฿${booking['price']}',
+                      ),
                     ),
                   ),
               ],

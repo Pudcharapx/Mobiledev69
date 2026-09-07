@@ -23,12 +23,15 @@ class Command(BaseCommand):
                 "name": "MobileDev Frontend 2",
                 "client_type": "public",
                 "jwt_alg": "RS256",
-                "_redirect_uris": "http://localhost:50000",
-                "_post_logout_redirect_uris": "http://localhost:50000",
+                "_redirect_uris": "http://localhost:50000/\nhttp://127.0.0.1:50000/",
+                "_post_logout_redirect_uris": "http://localhost:50000/\nhttp://127.0.0.1:50000/",
                 "_scope": "openid profile email",
                 "require_consent": False,
             },
         )
+        client._redirect_uris = "http://localhost:50000/\nhttp://127.0.0.1:50000/"
+        client._post_logout_redirect_uris = "http://localhost:50000/\nhttp://127.0.0.1:50000/"
+        client.save(update_fields=["_redirect_uris", "_post_logout_redirect_uris"])
         client.response_types.add(*response_types)
 
         if not RSAKey.objects.exists():
