@@ -28,9 +28,9 @@ class Command(BaseCommand):
         # properties so rerunning this command also repairs existing clients.
         client.redirect_uris = [
             "http://localhost:50000/callback",
-            "http://localhost:50000",
+            "http://localhost:50000/",
         ]
-        client.post_logout_redirect_uris = ["http://localhost:50000"]
+        client.post_logout_redirect_uris = ["http://localhost:50000/"]
         client._scope = "openid profile email"
         client.require_consent = False
         client.save()

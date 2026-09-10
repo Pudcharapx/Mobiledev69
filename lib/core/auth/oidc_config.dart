@@ -21,7 +21,7 @@ class OidcConfig {
       clientId: 'muscledev-frontend',
       scopes: const ['openid', 'profile', 'email'],
       redirectUri: Uri.parse('http://localhost:50000/callback'),
-      postLogoutRedirectUri: Uri.parse('http://localhost:50000'),
+      postLogoutRedirectUri: Uri.parse('http://localhost:50000/'),
     );
   }
 }
