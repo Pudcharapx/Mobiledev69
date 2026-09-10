@@ -35,7 +35,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -84,6 +84,6 @@ REST_FRAMEWORK = {
 }
 
 # OIDC Provider settings
-LOGIN_URL = "/admin/login/"
+LOGIN_URL = "/login/"
 SITE_URL = "http://127.0.0.1:8000"
 OIDC_IDTOKEN_INCLUDE_CLAIMS = True

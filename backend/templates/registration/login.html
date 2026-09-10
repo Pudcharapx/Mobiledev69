@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | Muscle Heatmap</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, sans-serif; }
+    body { align-items: center; background: #111827; display: flex; justify-content: center; margin: 0; min-height: 100vh; }
+    main { background: #1f2937; border: 1px solid #374151; border-radius: 14px; box-shadow: 0 18px 45px #0008; box-sizing: border-box; max-width: 420px; padding: 36px; width: calc(100% - 32px); }
+    h1 { color: #f9fafb; font-size: 26px; margin: 0 0 8px; }
+    p { color: #9ca3af; line-height: 1.5; margin: 0 0 26px; }
+    label { color: #e5e7eb; display: block; font-size: 14px; font-weight: 600; margin: 16px 0 7px; }
+    input { background: #111827; border: 1px solid #4b5563; border-radius: 8px; box-sizing: border-box; color: #f9fafb; font-size: 16px; padding: 11px 12px; width: 100%; }
+    button { background: #22c55e; border: 0; border-radius: 8px; color: #052e16; cursor: pointer; font-size: 16px; font-weight: 700; margin-top: 26px; padding: 12px; width: 100%; }
+    .error { background: #451a1a; border: 1px solid #b91c1c; border-radius: 8px; color: #fecaca; margin-bottom: 16px; padding: 10px 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Muscle Heatmap</h1>
+    <p>Sign in to continue to your workout dashboard.</p>
+    {% if form.errors %}<div class="error">Your username or password is incorrect.</div>{% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <label for="id_username">Username</label>
+      <input id="id_username" name="username" type="text" autocomplete="username" autofocus required>
+      <label for="id_password">Password</label>
+      <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+      {% if next %}<input name="next" type="hidden" value="{{ next }}">{% endif %}
+      <button type="submit">Sign in</button>
+    </form>
+  </main>
+</body>
+</html>
