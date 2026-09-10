@@ -19,18 +19,22 @@ class Command(BaseCommand):
             response_types.append(response_type)
 
         client, created = Client.objects.get_or_create(
-            client_id="muscledev-frontend",
-            defaults={
-                "name": "Muscle Heatmap Frontend",
-                "client_type": "public",
-                "jwt_alg": "RS256",
-                "_redirect_uris": "http://localhost:50000/callback http://localhost:50000",
-                "_post_logout_redirect_uris": "http://localhost:50000",
-                "_scope": "openid profile email",
-                "require_consent": False,
-            },
+            client_id="muscledev-frontend"
         )
-        client.response_types.add(*response_types)
+        client.name = "Muscle Heatmap Frontend"
+        client.client_type = "public"
+        client.jwt_alg = "RS256"
+        # django-oidc-provider stores one URI per line.  Use the model
+        # properties so rerunning this command also repairs existing clients.
+        client.redirect_uris = [
+            "http://localhost:50000/callback",
+            "http://localhost:50000",
+        ]
+        client.post_logout_redirect_uris = ["http://localhost:50000"]
+        client._scope = "openid profile email"
+        client.require_consent = False
+        client.save()
+        client.response_types.set(response_types)
 
         if not RSAKey.objects.exists():
             private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -42,7 +46,7 @@ class Command(BaseCommand):
             RSAKey.objects.create(key=pem)
             self.stdout.write(self.style.SUCCESS("Created RSA signing key for OIDC."))
 
-        action = "Created" if created else "Kept existing"
+        action = "Created" if created else "Updated"
         self.stdout.write(self.style.SUCCESS(f"{action} OIDC public client: {client.client_id}"))
 
         from django.contrib.auth.models import User
