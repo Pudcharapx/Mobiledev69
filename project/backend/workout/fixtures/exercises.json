@@ -1,0 +1,243 @@
+[
+  {
+    "model": "workout.exercise",
+    "pk": 1,
+    "fields": {
+      "name": "Bench Press",
+      "primary_muscle": "chest",
+      "secondary_muscles": ["shoulders", "triceps"],
+      "contribution_weight": {
+        "chest": 1.0,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 2,
+    "fields": {
+      "name": "Incline Dumbbell Press",
+      "primary_muscle": "chest",
+      "secondary_muscles": ["shoulders", "triceps"],
+      "contribution_weight": {
+        "chest": 1.0,
+        "shoulders": 0.5,
+        "triceps": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 3,
+    "fields": {
+      "name": "Push-up",
+      "primary_muscle": "chest",
+      "secondary_muscles": ["shoulders", "triceps", "core"],
+      "contribution_weight": {
+        "chest": 1.0,
+        "shoulders": 0.5,
+        "triceps": 0.5,
+        "core": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 4,
+    "fields": {
+      "name": "Pull-up",
+      "primary_muscle": "back",
+      "secondary_muscles": ["biceps", "shoulders"],
+      "contribution_weight": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "shoulders": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 5,
+    "fields": {
+      "name": "Lat Pulldown",
+      "primary_muscle": "back",
+      "secondary_muscles": ["biceps"],
+      "contribution_weight": {
+        "back": 1.0,
+        "biceps": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 6,
+    "fields": {
+      "name": "Barbell Row",
+      "primary_muscle": "back",
+      "secondary_muscles": ["biceps", "shoulders"],
+      "contribution_weight": {
+        "back": 1.0,
+        "biceps": 0.5,
+        "shoulders": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 7,
+    "fields": {
+      "name": "Deadlift",
+      "primary_muscle": "back",
+      "secondary_muscles": ["glutes", "hamstrings", "core"],
+      "contribution_weight": {
+        "back": 1.0,
+        "glutes": 0.5,
+        "hamstrings": 0.5,
+        "core": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 8,
+    "fields": {
+      "name": "Overhead Press",
+      "primary_muscle": "shoulders",
+      "secondary_muscles": ["triceps", "chest"],
+      "contribution_weight": {
+        "shoulders": 1.0,
+        "triceps": 0.5,
+        "chest": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 9,
+    "fields": {
+      "name": "Lateral Raise",
+      "primary_muscle": "shoulders",
+      "secondary_muscles": [],
+      "contribution_weight": {
+        "shoulders": 1.0
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 10,
+    "fields": {
+      "name": "Face Pull",
+      "primary_muscle": "shoulders",
+      "secondary_muscles": ["back"],
+      "contribution_weight": {
+        "shoulders": 1.0,
+        "back": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 11,
+    "fields": {
+      "name": "Barbell Squat",
+      "primary_muscle": "legs",
+      "secondary_muscles": ["glutes", "core"],
+      "contribution_weight": {
+        "legs": 1.0,
+        "glutes": 0.5,
+        "core": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 12,
+    "fields": {
+      "name": "Leg Press",
+      "primary_muscle": "legs",
+      "secondary_muscles": ["glutes"],
+      "contribution_weight": {
+        "legs": 1.0,
+        "glutes": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 13,
+    "fields": {
+      "name": "Romanian Deadlift",
+      "primary_muscle": "hamstrings",
+      "secondary_muscles": ["glutes", "back"],
+      "contribution_weight": {
+        "hamstrings": 1.0,
+        "glutes": 0.5,
+        "back": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 14,
+    "fields": {
+      "name": "Lunge",
+      "primary_muscle": "legs",
+      "secondary_muscles": ["glutes"],
+      "contribution_weight": {
+        "legs": 1.0,
+        "glutes": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 15,
+    "fields": {
+      "name": "Bicep Curl",
+      "primary_muscle": "biceps",
+      "secondary_muscles": [],
+      "contribution_weight": {
+        "biceps": 1.0
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 16,
+    "fields": {
+      "name": "Triceps Pushdown",
+      "primary_muscle": "triceps",
+      "secondary_muscles": [],
+      "contribution_weight": {
+        "triceps": 1.0
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 17,
+    "fields": {
+      "name": "Plank",
+      "primary_muscle": "core",
+      "secondary_muscles": ["shoulders"],
+      "contribution_weight": {
+        "core": 1.0,
+        "shoulders": 0.5
+      }
+    }
+  },
+  {
+    "model": "workout.exercise",
+    "pk": 18,
+    "fields": {
+      "name": "Hanging Leg Raise",
+      "primary_muscle": "core",
+      "secondary_muscles": [],
+      "contribution_weight": {
+        "core": 1.0
+      }
+    }
+  }
+]

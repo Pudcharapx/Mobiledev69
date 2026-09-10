@@ -1,0 +1,11 @@
+{
+    "name": "Muscle Heatmap Workout Tracker",
+    "short_name": "MuscleHeatmap",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0F172A",
+    "theme_color": "#1E293B",
+    "description": "Visual Workout Tracking and Muscle Heatmap",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false
+}
