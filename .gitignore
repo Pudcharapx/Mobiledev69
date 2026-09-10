@@ -1,4 +1,0 @@
-# Local runtimes and development databases
-**/.venv/
-**/__pycache__/
-backend2/db.sqlite3
