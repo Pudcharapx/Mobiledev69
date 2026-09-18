@@ -28,9 +28,24 @@ class Command(BaseCommand):
         # properties so rerunning this command also repairs existing clients.
         client.redirect_uris = [
             "http://localhost:50000/callback",
+            "http://localhost:50000/callback/",
+            "http://localhost:50000/login",
+            "http://localhost:50000/login/",
             "http://localhost:50000/",
+            "http://localhost:50000",
+            "http://127.0.0.1:50000/callback",
+            "http://127.0.0.1:50000/callback/",
+            "http://127.0.0.1:50000/login",
+            "http://127.0.0.1:50000/login/",
+            "http://127.0.0.1:50000/",
+            "http://127.0.0.1:50000",
         ]
-        client.post_logout_redirect_uris = ["http://localhost:50000/"]
+        client.post_logout_redirect_uris = [
+            "http://localhost:50000/",
+            "http://localhost:50000",
+            "http://127.0.0.1:50000/",
+            "http://127.0.0.1:50000",
+        ]
         client._scope = "openid profile email"
         client.require_consent = False
         client.save()
@@ -58,3 +73,11 @@ class Command(BaseCommand):
         demo_user.set_password("demo12345")
         demo_user.save()
         self.stdout.write(self.style.SUCCESS("Ensured demo user exists: demouser / demo12345"))
+
+        test_user, t_created = User.objects.get_or_create(
+            username="test",
+            defaults={"email": "test@example.com", "first_name": "Test", "last_name": "User"},
+        )
+        test_user.set_password("1234")
+        test_user.save()
+        self.stdout.write(self.style.SUCCESS("Ensured test user exists: test / 1234"))

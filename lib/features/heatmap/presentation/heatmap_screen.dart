@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/ambient_mesh_background.dart';
 import '../../../core/widgets/app_top_nav_bar.dart';
+import '../../../core/widgets/glass_container.dart';
 import '../../../core/widgets/pill_tab_bar.dart';
 import '../../workout/presentation/workout_view_model.dart';
 import '../domain/imbalance_calculator.dart';
@@ -72,34 +74,35 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => vm.loadInitialData(),
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 540),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Pill / Segmented Tab Bar for switching Heatmap / Log List / Settings (SRS 9.2)
-                  const PillTabBar(currentRoute: '/'),
+      body: AmbientMeshBackground(
+        child: RefreshIndicator(
+          onRefresh: () => vm.loadInitialData(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 540),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Pill / Segmented Tab Bar for switching Heatmap / Log List / Settings (SRS 9.2)
+                    const PillTabBar(currentRoute: '/'),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Dark feature card for Imbalance Alert summary (SRS 8.2, 9.2, 9.3 at top)
-                  ImbalanceAlertCard(
-                    activeAlerts: activeAlerts,
-                    allEvaluatedPairs: allEvaluatedPairs,
-                    onLogAction: () => context.push('/workouts/new'),
-                  ),
+                    // Dark feature card for Imbalance Alert summary (SRS 8.2, 9.2, 9.3 at top)
+                    ImbalanceAlertCard(
+                      activeAlerts: activeAlerts,
+                      allEvaluatedPairs: allEvaluatedPairs,
+                      onLogAction: () => context.push('/workouts/new'),
+                    ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Week Header & Overall Weekly Balance Card with Circular Progress Ring (SRS 9.2)
-                  Card(
-                    child: Padding(
+                    // Week Header & Overall Weekly Balance Card with Circular Progress Ring (SRS 9.2)
+                    GlassCard(
+                      borderRadius: 24,
                       padding: const EdgeInsets.all(22),
                       child: Row(
                         children: [
@@ -162,13 +165,12 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                         ],
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Body Heatmap SVG Card
-                  Card(
-                    child: Padding(
+                    // Body Heatmap SVG Card
+                    GlassCard(
+                      borderRadius: 24,
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
@@ -190,38 +192,36 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                         ],
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Quick Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push('/workouts'),
-                          icon: const Icon(Icons.history_rounded),
-                          label: const Text('Workout Logs'),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                    // Quick Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GlassButton(
+                            onPressed: () => context.push('/workouts'),
+                            icon: const Icon(Icons.history_rounded, size: 18),
+                            label: 'Workout Logs',
+                            accentColor: isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFF64748B),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => context.push('/workouts/new'),
-                          icon: const Icon(Icons.add_rounded),
-                          label: const Text('Log Workout'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GlassButton(
+                            onPressed: () => context.push('/workouts/new'),
+                            icon: const Icon(Icons.add_rounded, size: 18),
+                            label: 'Log Workout',
+                            accentColor: const Color(0xFF6366F1),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/glass_container.dart';
 import '../domain/imbalance_calculator.dart';
 
 /// Dark feature card displaying the Imbalance Alert summary per SRS.md sections 8.2 and 9.2.
@@ -27,22 +28,29 @@ class _ImbalanceAlertCardState extends State<ImbalanceAlertCard> {
   Widget build(BuildContext context) {
     final hasAlerts = widget.activeAlerts.isNotEmpty;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.darkFeatureCardBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: hasAlerts
-              ? AppColors.alertWarning.withValues(alpha: 0.6)
-              : AppColors.borderDark,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+    return GlassContainer(
+      borderRadius: 24,
+      blur: 18.0,
+      borderWidth: 1.2,
+      borderGradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: hasAlerts
+            ? [
+                AppColors.alertWarning.withValues(alpha: 0.8),
+                AppColors.alertWarning.withValues(alpha: 0.2),
+              ]
+            : [
+                Colors.white.withValues(alpha: 0.4),
+                Colors.white.withValues(alpha: 0.1),
+              ],
+      ),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF0F172A).withValues(alpha: 0.82),
+          const Color(0xFF1E293B).withValues(alpha: 0.68),
         ],
       ),
       padding: const EdgeInsets.all(20),

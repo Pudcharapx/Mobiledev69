@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DormMate — UI Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #E8E8EF;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(99,102,241,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.10) 0%, transparent 50%);
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  /* ---------- PAGE HEADER ---------- */
+  .page-title {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .page-title h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111;
+    letter-spacing: -0.5px;
+  }
+  .page-title p {
+    font-size: 14px;
+    color: #6E6E73;
+    margin-top: 6px;
+  }
+
+  /* ---------- SCREEN LABELS ---------- */
+  .screens-wrapper {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-top: 36px;
+  }
+
+  .screen-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .screen-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6E6E73;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- PHONE FRAME ---------- */
+  .phone {
+    width: 320px;
+    height: 692px;
+    background: #fff;
+    border-radius: 44px;
+    box-shadow:
+      0 0 0 10px #1C1C1E,
+      0 30px 80px rgba(0,0,0,0.35),
+      0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  /* Dynamic Island */
+  .dynamic-island {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 28px;
+    background: #1C1C1E;
+    border-radius: 20px;
+    z-index: 100;
+  }
+
+  /* ---------- STATUS BAR ---------- */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 54px 24px 8px;
+    flex-shrink: 0;
+  }
+  .status-time { font-size: 13px; font-weight: 600; color: inherit; }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { width: 14px; height: 14px; }
+
+  /* ---------- SCROLL AREA ---------- */
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+  .screen-content { padding: 0 18px 120px; }
+
+  /* ---------- BOTTOM NAV ---------- */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 82px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px 20px;
+    z-index: 50;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    cursor: pointer;
+  }
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-label {
+    font-size: 9px;
+    font-weight: 500;
+    color: #999;
+  }
+  .nav-item.active .nav-label { color: #5856D6; }
+  .nav-item.active svg path,
+  .nav-item.active svg rect,
+  .nav-item.active svg circle { fill: #5856D6; }
+
+  /* ---------- GLASS CARD ---------- */
+  .glass-card {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 20px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .glass-card-sm {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 16px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  /* ---------- STATUS BADGE ---------- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .badge-pending { background: #FFF3E0; color: #E65100; }
+  .badge-pending .badge-dot { background: #FF9800; }
+  .badge-inprogress { background: #E3F2FD; color: #1565C0; }
+  .badge-inprogress .badge-dot { background: #2196F3; }
+  .badge-completed { background: #E8F5E9; color: #2E7D32; }
+  .badge-completed .badge-dot { background: #4CAF50; }
+  .badge-unpaid { background: #FFEBEE; color: #C62828; }
+  .badge-unpaid .badge-dot { background: #F44336; }
+  .badge-paid { background: #E8F5E9; color: #2E7D32; }
+  .badge-paid .badge-dot { background: #4CAF50; }
+
+  /* ---------- DIVIDER ---------- */
+  .divider {
+    height: 1px;
+    background: rgba(0,0,0,0.06);
+    margin: 12px 0;
+  }
+
+  /* ---------- SECTION HEADER ---------- */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .section-title { font-size: 15px; font-weight: 700; color: #111; }
+  .section-link { font-size: 12px; color: #5856D6; font-weight: 500; }
+
+  /* ---------- PRIMARY BUTTON ---------- */
+  .btn-primary {
+    width: 100%;
+    background: #111111;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: -0.1px;
+  }
+  .btn-secondary {
+    width: 100%;
+    background: rgba(88,86,214,0.08);
+    color: #5856D6;
+    border: none;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .btn-danger-ghost {
+    background: rgba(255,59,48,0.08);
+    color: #FF3B30;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ════════════════════════════════════════
+     SCREEN 1 — LOGIN
+  ════════════════════════════════════════ */
+  .login-bg {
+    background: linear-gradient(160deg, #F5F5F7 0%, #E8E8F0 50%, #EEE8F5 100%);
+  }
+  .login-bg .status-bar { color: #111; }
+
+  .login-logo-area {
+    padding: 40px 24px 28px;
+    text-align: center;
+  }
+  .login-logo-icon {
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #5856D6, #AF52DE);
+    border-radius: 18px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(88,86,214,0.28);
+  }
+  .login-logo-icon svg { width: 34px; height: 34px; }
+  .login-app-name {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.8px;
+    margin-bottom: 6px;
+  }
+  .login-tagline {
+    font-size: 15px;
+    color: #6E6E73;
+    font-weight: 400;
+  }
+
+  .login-card-area {
+    padding: 0 22px;
+    margin-top: 8px;
+  }
+  .login-card {
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 28px 22px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  }
+  .login-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 6px;
+  }
+  .login-card-sub {
+    font-size: 13px;
+    color: #6E6E73;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .login-note {
+    text-align: center;
+    font-size: 12px;
+    color: #AEAEB2;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  /* ════════════════════════════════════════
+     SCREEN 2 — HOME
+  ════════════════════════════════════════ */
+  .home-bg {
+    background: #F5F5F7;
+  }
+  .home-bg .status-bar { color: #111; }
+
+  .home-greeting {
+    padding: 8px 0 20px;
+  }
+  .home-greeting-sub {
+    font-size: 14px;
+    color: #6E6E73;
+    font-weight: 400;
+  }
+  .home-greeting-name {
+    font-size: 26px;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.6px;
+    margin-top: 2px;
+  }
+  .home-avatar {
+    position: absolute;
+    top: 70px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5856D6, #AF52DE);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+  }
+  .home-bell {
+    position: absolute;
+    top: 116px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.9);
+  }
+
+  /* Room card */
+  .room-card {
+    background: linear-gradient(135deg, #1C1C1E 0%, #2D2D30 100%);
+    border-radius: 20px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .room-card::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(88,86,214,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .room-card-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .room-card-number {
+    font-size: 34px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    margin: 6px 0 4px;
+  }
+  .room-card-info {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+  }
+  .room-card-badge {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: rgba(88,86,214,0.3);
+    border: 1px solid rgba(88,86,214,0.5);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #A29BFE;
+  }
+
+  /* Mini grid cards */
+  .mini-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .mini-card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+  }
+  .mini-card-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #AEAEB2;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .mini-card-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.5px;
+  }
+  .mini-card-sub {
+    font-size: 11px;
+    color: #6E6E73;
+    margin-top: 3px;
+  }
+  .mini-card-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  /* Announcement item */
+  .announcement-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+  }
+  .ann-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #5856D6;
+    flex-shrink: 0;
+  }
+  .ann-content { flex: 1; }
+  .ann-title { font-size: 13px; font-weight: 600; color: #111; }
+  .ann-date { font-size: 11px; color: #AEAEB2; margin-top: 2px; }
+  .ann-arrow { font-size: 16px; color: #C7C7CC; }
+
+  /* ════════════════════════════════════════
+     SCREEN 3 — EXPENSES
+  ════════════════════════════════════════ */
+  .expense-bg { background: #F5F5F7; }
+  .expense-bg .status-bar { color: #111; }
+
+  .expense-summary-card {
+    background: linear-gradient(135deg, #5856D6 0%, #AF52DE 100%);
+    border-radius: 24px;
+    padding: 24px 22px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .expense-summary-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 130px; height: 130px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .expense-summary-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .expense-summary-amount {
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+    margin: 8px 0 4px;
+  }
+  .expense-summary-period {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+  }
+  .expense-summary-badge {
+    position: absolute;
+    bottom: 22px;
+    right: 22px;
+    background: rgba(255,59,48,0.9);
+    border-radius: 10px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .expense-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+  }
+  .expense-row-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+  }
+  .expense-row-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .expense-row-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+  }
+  .expense-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .expense-total-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111;
+  }
+  .expense-total-amount {
+    font-size: 18px;
+    font-weight: 800;
+    color: #111;
+  }
+
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+  }
+  .history-month { font-size: 14px; font-weight: 600; color: #111; }
+  .history-amount { font-size: 14px; font-weight: 700; color: #111; }
+  .history-sub { font-size: 11px; color: #AEAEB2; margin-top: 2px; }
+
+  /* ════════════════════════════════════════
+     SCREEN 4 — MAINTENANCE
+  ════════════════════════════════════════ */
+  .maint-bg { background: #F5F5F7; }
+
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-tab {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .filter-tab.active {
+    background: #111;
+    color: #fff;
+  }
+  .filter-tab:not(.active) {
+    background: rgba(255,255,255,0.8);
+    color: #6E6E73;
+    border: 1px solid rgba(0,0,0,0.07);
+  }
+
+  .maintenance-card {
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .maint-icon-box {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    background: #F2F2F7;
+  }
+  .maint-title { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 4px; }
+  .maint-sub { font-size: 12px; color: #AEAEB2; }
+  .maint-right {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .maint-date { font-size: 11px; color: #C7C7CC; }
+
+  .fab-btn {
+    position: absolute;
+    bottom: 90px;
+    right: 18px;
+    width: 52px;
+    height: 52px;
+    background: #111;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    z-index: 60;
+    cursor: pointer;
+  }
+
+  /* ════════════════════════════════════════
+     SCREEN 5 — PROFILE
+  ════════════════════════════════════════ */
+  .profile-bg { background: #F5F5F7; }
+
+  .profile-hero {
+    background: linear-gradient(155deg, #1C1C1E 0%, #2D2D35 100%);
+    border-radius: 24px;
+    padding: 24px 22px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    bottom: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(88,86,214,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .profile-avatar-lg {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5856D6, #AF52DE);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    border: 3px solid rgba(255,255,255,0.15);
+  }
+  .profile-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 3px;
+  }
+  .profile-email {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+  }
+  .profile-room-chip {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(88,86,214,0.25);
+    border: 1px solid rgba(88,86,214,0.4);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #A29BFE;
+  }
+
+  .settings-group {
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  .settings-item:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .settings-item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .settings-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .settings-item-title { font-size: 14px; font-weight: 500; color: #111; }
+  .settings-item-sub { font-size: 11px; color: #AEAEB2; margin-top: 1px; }
+  .settings-arrow { font-size: 16px; color: #C7C7CC; }
+
+  /* ════════════════════════════════════════
+     SCREEN 6 — CREATE MAINTENANCE
+  ════════════════════════════════════════ */
+  .create-bg { background: #F5F5F7; }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6E6E73;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 7px;
+  }
+  .form-input {
+    width: 100%;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 13px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #111;
+    margin-bottom: 14px;
+    outline: none;
+  }
+  .form-input.focused { border-color: #5856D6; box-shadow: 0 0 0 3px rgba(88,86,214,0.12); }
+  .form-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 13px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #111;
+    margin-bottom: 14px;
+    outline: none;
+    resize: none;
+    height: 80px;
+  }
+  .form-select {
+    width: 100%;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 13px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #111;
+    margin-bottom: 14px;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23AEAEB2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+  .photo-upload {
+    border: 2px dashed rgba(0,0,0,0.12);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .photo-upload-icon { font-size: 24px; margin-bottom: 6px; }
+  .photo-upload-text { font-size: 13px; color: #6E6E73; }
+  .photo-upload-sub { font-size: 11px; color: #AEAEB2; margin-top: 3px; }
+
+  /* Announcement detail */
+  .ann-detail-img {
+    width: 100%;
+    height: 150px;
+    background: linear-gradient(135deg, #E3E3EE, #D1D1E8);
+    border-radius: 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+  }
+  .ann-detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ann-tag {
+    background: rgba(88,86,214,0.1);
+    color: #5856D6;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .ann-date-text { font-size: 11px; color: #AEAEB2; }
+  .ann-detail-title { font-size: 20px; font-weight: 700; color: #111; margin-bottom: 10px; letter-spacing: -0.3px; }
+  .ann-detail-body { font-size: 14px; color: #444; line-height: 1.65; }
+
+  /* ════════════════════
+     NAV SVG ICONS
+  ════════════════════ */
+  .svg-home, .svg-expense, .svg-maint, .svg-ann, .svg-profile { fill: #C7C7CC; }
+
+  /* page nav */
+  .page-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .page-nav-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: rgba(255,255,255,0.8);
+    color: #333;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .page-nav-btn:hover { background: #111; color: #fff; border-color: #111; }
+
+  /* ════════════════════
+     MICRO-ANIMATIONS
+  ════════════════════ */
+  .glass-card, .room-card, .mini-card, .maintenance-card, .expense-summary-card, .btn-primary, .btn-secondary {
+    transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.18s ease;
+    cursor: pointer;
+  }
+  .glass-card:active, .room-card:active, .mini-card:active, .maintenance-card:active, .expense-summary-card:active, .btn-primary:active, .btn-secondary:active {
+    transform: scale(0.975);
+  }
+  .filter-tab {
+    transition: all 0.22s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  @keyframes fadeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .screen-column {
+    animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .screen-column:nth-child(1) { animation-delay: 0.05s; }
+  .screen-column:nth-child(2) { animation-delay: 0.12s; }
+  .screen-column:nth-child(3) { animation-delay: 0.19s; }
+  .screen-column:nth-child(4) { animation-delay: 0.26s; }
+  .screen-column:nth-child(5) { animation-delay: 0.33s; }
+  .screen-column:nth-child(6) { animation-delay: 0.40s; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>DormMate</h1>
+  <p>UI Mockup — iOS-inspired Glassmorphism Design</p>
+</div>
+
+<div class="screens-wrapper">
+
+  <!-- ══════════════════════════════
+       SCREEN 1 — LOGIN
+  ══════════════════════════════ -->
+  <div class="screen-column">
+    <div class="screen-label">Login</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <!-- BG -->
+      <div style="position:absolute;inset:0;background:linear-gradient(160deg,#F5F5F7 0%,#EBE8F8 50%,#F0EBF8 100%);z-index:0;"></div>
+      <div style="position:absolute;top:80px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(88,86,214,0.10) 0%,transparent 70%);z-index:0;border-radius:50%;"></div>
+      <div style="position:absolute;bottom:100px;right:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(175,82,222,0.09) 0%,transparent 70%);z-index:0;border-radius:50%;"></div>
+
+      <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;">
+        <div class="status-bar" style="color:#111;">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg viewBox="0 0 15 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#111"/><rect x="4" y="2" width="3" height="10" rx="1" fill="#111"/><rect x="8" y="0" width="3" height="12" rx="1" fill="#111"/><rect x="12" y="0" width="3" height="12" rx="1" fill="rgba(0,0,0,0.2)"/></svg>
+            <svg viewBox="0 0 16 12" fill="#111"><path d="M8 2.5C5.2 2.5 2.8 3.7 1.2 5.6L0 4.4C1.9 2.2 4.8 0.8 8 0.8s6.1 1.4 7.9 3.6L14.8 5.6C13.2 3.7 10.8 2.5 8 2.5z"/><path d="M8 5.8c-1.8 0-3.4.8-4.5 2.1L2.2 6.7C3.6 5.1 5.7 4.1 8 4.1s4.4 1 5.8 2.6l-1.3 1.2C11.4 6.6 9.8 5.8 8 5.8z"/><circle cx="8" cy="10.5" r="1.5"/></svg>
+            <svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#111" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#111"/><path d="M23 4v4a2 2 0 000-4z" fill="#111" fill-opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <div class="login-logo-area">
+          <div class="login-logo-icon">
+            <svg viewBox="0 0 34 34" fill="none">
+              <rect x="4" y="4" width="26" height="26" rx="7" fill="rgba(255,255,255,0.25)"/>
+              <path d="M10 17h14M17 10v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="login-app-name">DormMate</div>
+          <div class="login-tagline">Your dorm, simplified.</div>
+        </div>
+
+        <div class="login-card-area">
+          <div class="login-card">
+            <div class="login-card-title">Welcome</div>
+            <div class="login-card-sub">Sign in with your university account to continue.</div>
+            <button class="btn-primary">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="8" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+                <path d="M6 9l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Continue with Sign In
+            </button>
+            <div class="login-note">Protected by OIDC authentication.<br>Your credentials are handled securely.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:auto;padding:0 22px 40px;text-align:center;">
+          <span style="font-size:12px;color:#AEAEB2;">DormMate v1.0 · Faculty of Engineering</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SCREEN 2 — HOME
+  ══════════════════════════════ -->
+  <div class="screen-column">
+    <div class="screen-label">Home</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div style="position:absolute;inset:0;background:#F5F5F7;z-index:0;"></div>
+
+      <div class="status-bar" style="color:#111;position:relative;z-index:1;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 15 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#111"/><rect x="4" y="2" width="3" height="10" rx="1" fill="#111"/><rect x="8" y="0" width="3" height="12" rx="1" fill="#111"/><rect x="12" y="0" width="3" height="12" rx="1" fill="rgba(0,0,0,0.2)"/></svg>
+          <svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#111" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#111"/><path d="M23 4v4a2 2 0 000-4z" fill="#111" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <!-- Avatar & Bell -->
+      <div class="home-avatar" style="position:absolute;top:66px;right:18px;z-index:10;">P</div>
+      <div class="home-bell" style="position:absolute;top:112px;right:18px;z-index:10;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1.5A4.5 4.5 0 003.5 6v2.5L2 10h12l-1.5-1.5V6A4.5 4.5 0 008 1.5z" stroke="#444" stroke-width="1.3" fill="none"/>
+          <path d="M6.5 13a1.5 1.5 0 003 0" stroke="#444" stroke-width="1.3" fill="none"/>
+          <circle cx="12" cy="3" r="2.5" fill="#FF3B30"/>
+        </svg>
+      </div>
+
+      <div class="scroll-area" style="position:relative;z-index:1;">
+        <div class="screen-content">
+          <div class="home-greeting">
+            <div class="home-greeting-sub">Good evening</div>
+            <div class="home-greeting-name">Pudcharapon</div>
+          </div>
+
+          <!-- Room Card -->
+          <div class="room-card">
+            <div class="room-card-label">My Room</div>
+            <div class="room-card-number">B-204</div>
+            <div class="room-card-info">Building B · 2nd Floor · Twin Room</div>
+            <div class="room-card-badge">Active</div>
+          </div>
+
+          <!-- Mini Cards Grid -->
+          <div class="mini-cards-grid">
+            <div class="mini-card">
+              <div class="mini-card-icon" style="background:rgba(88,86,214,0.1);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" fill="#5856D6" stroke="#5856D6" stroke-width="1" stroke-linejoin="round"/></svg></div>
+              <div class="mini-card-label">September</div>
+              <div class="mini-card-value">฿1,850</div>
+              <div class="mini-card-sub">Monthly expenses</div>
+            </div>
+            <div class="mini-card">
+              <div class="mini-card-icon" style="background:rgba(255,149,0,0.1);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="#FF9500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="mini-card-label">Maintenance</div>
+              <div class="mini-card-value" style="font-size:18px;">1 Active</div>
+              <div class="mini-card-sub" style="display:flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#2196F3;display:inline-block;"></span> In Progress</div>
+            </div>
+          </div>
+
+          <!-- Announcements -->
+          <div class="glass-card" style="padding:16px 18px;">
+            <div class="section-header">
+              <div class="section-title">Announcements</div>
+              <div class="section-link">See all</div>
+            </div>
+            <div class="announcement-item">
+              <div class="ann-dot"></div>
+              <div class="ann-content">
+                <div class="ann-title">Water system maintenance</div>
+                <div class="ann-date">18 Sep 2026</div>
+              </div>
+              <div class="ann-arrow">›</div>
+            </div>
+            <div class="divider"></div>
+            <div class="announcement-item">
+              <div class="ann-dot" style="background:#AEAEB2;"></div>
+              <div class="ann-content">
+                <div class="ann-title">Common area schedule update</div>
+                <div class="ann-date">15 Sep 2026</div>
+              </div>
+              <div class="ann-arrow">›</div>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <button class="btn-primary" style="border-radius:14px;padding:13px;font-size:12px;background:rgba(0,0,0,0.85);">+ New Request</button>
+            <button class="btn-primary" style="border-radius:14px;padding:13px;font-size:12px;background:rgba(88,86,214,0.12);color:#5856D6;">View Expenses</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active">
+          <div class="nav-icon"><svg viewBox="0 0 24 24" fill="#5856D6" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
+          <span class="nav-label" style="color:#5856D6;">Home</span>
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg></div>
+          <span class="nav-label">Expenses</span>
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.72L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5V2.05z"/></svg></div>
+          <span class="nav-label">Maintenance</span>
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg></div>
+          <span class="nav-label">Announce</span>
+        </div>
+        <div class="nav-item">
+          <div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+          <span class="nav-label">Profile</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SCREEN 3 — EXPENSES
+  ══════════════════════════════ -->
+  <div class="screen-column">
+    <div class="screen-label">Expenses</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div style="position:absolute;inset:0;background:#F5F5F7;z-index:0;"></div>
+
+      <div class="status-bar" style="color:#111;position:relative;z-index:1;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#111" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#111"/><path d="M23 4v4a2 2 0 000-4z" fill="#111" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="scroll-area" style="position:relative;z-index:1;">
+        <div class="screen-content">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div style="font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">Expenses</div>
+            <div style="font-size:13px;color:#5856D6;font-weight:500;">History</div>
+          </div>
+
+          <!-- Summary Card -->
+          <div class="expense-summary-card">
+            <div class="expense-summary-label">September 2026</div>
+            <div class="expense-summary-amount">฿1,100</div>
+            <div class="expense-summary-period">Due 30 Sep 2026</div>
+            <div class="expense-summary-badge">Unpaid</div>
+          </div>
+
+          <!-- Breakdown -->
+          <div class="glass-card">
+            <div class="section-title" style="margin-bottom:4px;">Breakdown</div>
+            <div style="font-size:12px;color:#AEAEB2;margin-bottom:12px;">September 2026</div>
+            <div class="expense-row">
+              <div class="expense-row-label">
+                <div class="expense-row-icon" style="background:rgba(255,204,0,0.12);"><svg width="13" height="13" viewBox="0 0 24 24" fill="#E6AC00"><path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"/></svg></div>
+                Electricity
+              </div>
+              <div class="expense-row-amount">฿620</div>
+            </div>
+            <div class="divider" style="margin:6px 0;"></div>
+            <div class="expense-row">
+              <div class="expense-row-label">
+                <div class="expense-row-icon" style="background:rgba(0,122,255,0.10);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0c0-5-7-13-7-13z" fill="#0A7AFF" fill-opacity="0.85"/></svg></div>
+                Water
+              </div>
+              <div class="expense-row-amount">฿180</div>
+            </div>
+            <div class="divider" style="margin:6px 0;"></div>
+            <div class="expense-row">
+              <div class="expense-row-label">
+                <div class="expense-row-icon" style="background:rgba(88,86,214,0.10);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" stroke="#5856D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                Internet
+              </div>
+              <div class="expense-row-amount">฿300</div>
+            </div>
+            <div class="divider" style="margin:6px 0;"></div>
+            <div class="expense-row">
+              <div class="expense-row-label">
+                <div class="expense-row-icon" style="background:rgba(0,0,0,0.05);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#AEAEB2" stroke-width="2"/><path d="M3 9h18" stroke="#AEAEB2" stroke-width="2"/><path d="M9 21V9" stroke="#AEAEB2" stroke-width="2"/></svg></div>
+                Other
+              </div>
+              <div class="expense-row-amount" style="color:#AEAEB2;">฿0</div>
+            </div>
+            <div style="height:1px;background:rgba(0,0,0,0.08);margin:12px 0;"></div>
+            <div class="expense-total-row">
+              <div class="expense-total-label">Total</div>
+              <div class="expense-total-amount">฿1,100</div>
+            </div>
+          </div>
+
+          <!-- History -->
+          <div class="section-header" style="margin-top:4px;">
+            <div class="section-title">History</div>
+          </div>
+          <div class="glass-card-sm">
+            <div class="history-item">
+              <div><div class="history-month">August 2026</div><div class="history-sub">Paid · 15 Aug</div></div>
+              <div style="text-align:right;"><div class="history-amount">฿1,050</div><div class="badge badge-paid" style="font-size:10px;padding:2px 8px;">Paid</div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="history-item">
+              <div><div class="history-month">July 2026</div><div class="history-sub">Paid · 12 Jul</div></div>
+              <div style="text-align:right;"><div class="history-amount">฿980</div><div class="badge badge-paid" style="font-size:10px;padding:2px 8px;">Paid</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><span class="nav-label">Home</span></div>
+        <div class="nav-item active"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#5856D6" width="22" height="22"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg></div><span class="nav-label" style="color:#5856D6;">Expenses</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.72L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5V2.05z"/></svg></div><span class="nav-label">Maintenance</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg></div><span class="nav-label">Announce</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><span class="nav-label">Profile</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SCREEN 4 — MAINTENANCE
+  ══════════════════════════════ -->
+  <div class="screen-column">
+    <div class="screen-label">Maintenance</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div style="position:absolute;inset:0;background:#F5F5F7;z-index:0;"></div>
+
+      <div class="status-bar" style="color:#111;position:relative;z-index:1;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#111" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#111"/><path d="M23 4v4a2 2 0 000-4z" fill="#111" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="scroll-area" style="position:relative;z-index:1;">
+        <div class="screen-content">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">Maintenance</div>
+          </div>
+
+          <div class="filter-tabs">
+            <button class="filter-tab active">All</button>
+            <button class="filter-tab">Pending</button>
+            <button class="filter-tab">Active</button>
+            <button class="filter-tab">Done</button>
+          </div>
+
+          <!-- Card 1: In Progress -->
+          <div class="maintenance-card">
+            <div class="maint-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07" stroke="#5856D6" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="#5856D6"/></svg></div>
+            <div style="flex:1;">
+              <div class="maint-title">Air conditioner not cooling</div>
+              <div class="maint-sub">Air Conditioner · Room B-204</div>
+            </div>
+            <div class="maint-right">
+              <div class="badge badge-inprogress"><div class="badge-dot"></div>In Progress</div>
+              <div class="maint-date">18 Sep</div>
+            </div>
+          </div>
+
+          <!-- Card 2: Pending -->
+          <div class="maintenance-card">
+            <div class="maint-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12h16M4 12a8 8 0 0116 0" stroke="#FF9500" stroke-width="1.8" stroke-linecap="round"/><path d="M8 12v6M12 12v8M16 12v6" stroke="#FF9500" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            <div style="flex:1;">
+              <div class="maint-title">Shower drain is clogged</div>
+              <div class="maint-sub">Bathroom · Room B-204</div>
+            </div>
+            <div class="maint-right">
+              <div class="badge badge-pending"><div class="badge-dot"></div>Pending</div>
+              <div class="maint-date">16 Sep</div>
+            </div>
+          </div>
+
+          <!-- Card 3: Completed -->
+          <div class="maintenance-card" style="opacity:0.65;">
+            <div class="maint-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21h6M12 3a6 6 0 016 6c0 2.4-1.4 4.5-3 5.7V17H9v-2.3C7.4 13.5 6 11.4 6 9a6 6 0 016-6z" stroke="#AEAEB2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="flex:1;">
+              <div class="maint-title">Hallway light flickering</div>
+              <div class="maint-sub">Electrical · Building B</div>
+            </div>
+            <div class="maint-right">
+              <div class="badge badge-completed"><div class="badge-dot"></div>Done</div>
+              <div class="maint-date">10 Sep</div>
+            </div>
+          </div>
+
+          <!-- Empty hint -->
+          <div style="text-align:center;padding:20px 0 10px;">
+            <div style="font-size:12px;color:#AEAEB2;">Swipe left on a request to cancel</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAB -->
+      <div class="fab-btn">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 4v14M4 11h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><span class="nav-label">Home</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></div><span class="nav-label">Expenses</span></div>
+        <div class="nav-item active"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#5856D6" width="22" height="22"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.72L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5V2.05z"/></svg></div><span class="nav-label" style="color:#5856D6;">Maintenance</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg></div><span class="nav-label">Announce</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><span class="nav-label">Profile</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SCREEN 5 — CREATE MAINTENANCE
+  ══════════════════════════════ -->
+  <div class="screen-column">
+    <div class="screen-label">Create Request</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div style="position:absolute;inset:0;background:#F5F5F7;z-index:0;"></div>
+
+      <div class="status-bar" style="color:#111;position:relative;z-index:1;">
+        <span class="status-time">9:41</span>
+      </div>
+
+      <div class="scroll-area" style="position:relative;z-index:1;">
+        <div class="screen-content" style="padding-bottom:40px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;">‹</div>
+            <div style="font-size:20px;font-weight:700;color:#111;">New Request</div>
+          </div>
+
+          <div class="form-label">Problem Title</div>
+          <input class="form-input focused" type="text" value="Air conditioner not cooling" readonly>
+
+          <div class="form-label">Category</div>
+          <select class="form-select" disabled>
+            <option>Air Conditioner</option>
+            <option>Electrical</option>
+            <option>Water</option>
+          </select>
+
+          <div class="form-label">Description</div>
+          <textarea class="form-textarea" readonly>The AC has been running but the room is still hot. It started 2 days ago.</textarea>
+
+          <div class="form-label">Photo (Optional)</div>
+          <div class="photo-upload">
+            <div class="photo-upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="#AEAEB2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="#AEAEB2" stroke-width="1.5"/></svg></div>
+            <div class="photo-upload-text">Add a photo</div>
+            <div class="photo-upload-sub">Tap to upload from camera or library</div>
+          </div>
+
+          <button class="btn-primary" style="margin-top:4px;">Submit Request</button>
+          <button class="btn-secondary" style="margin-top:10px;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SCREEN 6 — PROFILE
+  ══════════════════════════════ -->
+  <div class="screen-column">
+    <div class="screen-label">Profile</div>
+    <div class="phone">
+      <div class="dynamic-island"></div>
+      <div style="position:absolute;inset:0;background:#F5F5F7;z-index:0;"></div>
+
+      <div class="status-bar" style="color:#111;position:relative;z-index:1;">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#111" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#111"/><path d="M23 4v4a2 2 0 000-4z" fill="#111" fill-opacity="0.4"/></svg>
+        </div>
+      </div>
+
+      <div class="scroll-area" style="position:relative;z-index:1;">
+        <div class="screen-content">
+          <div style="font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;margin-bottom:16px;">Profile</div>
+
+          <!-- Profile Hero -->
+          <div class="profile-hero">
+            <div class="profile-avatar-lg">P</div>
+            <div>
+              <div class="profile-name">Pudcharapon X.</div>
+              <div class="profile-email">pudcharapon@uni.ac.th</div>
+              <div class="profile-room-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="#A29BFE"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Room B-204</div>
+            </div>
+          </div>
+
+          <!-- Room info group -->
+          <div style="font-size:11px;font-weight:600;color:#AEAEB2;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Room Information</div>
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <div class="settings-icon" style="background:rgba(88,86,214,0.1);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="1" stroke="#5856D6" stroke-width="1.8"/><path d="M3 9h18M9 9v12" stroke="#5856D6" stroke-width="1.8"/></svg></div>
+                <div><div class="settings-item-title">Building</div><div class="settings-item-sub">Building B</div></div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <div class="settings-icon" style="background:rgba(0,122,255,0.1);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 4H5v16h16v-8" stroke="#0A7AFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="12" r="1" fill="#0A7AFF"/></svg></div>
+                <div><div class="settings-item-title">Room</div><div class="settings-item-sub">B-204 · 2nd Floor</div></div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+          </div>
+
+          <!-- Account group -->
+          <div style="font-size:11px;font-weight:600;color:#AEAEB2;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;margin-top:4px;">Account</div>
+          <div class="settings-group">
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <div class="settings-icon" style="background:rgba(255,149,0,0.1);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#FF9500" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#FF9500" stroke-width="1.8"/></svg></div>
+                <div><div class="settings-item-title">Personal Info</div></div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <div class="settings-icon" style="background:rgba(52,199,89,0.1);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="#34C759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div><div class="settings-item-title">Notifications</div></div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-left">
+                <div class="settings-icon" style="background:rgba(0,0,0,0.05);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="#555" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="#555" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div><div class="settings-item-title">Appearance</div><div class="settings-item-sub">Light mode</div></div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+          </div>
+
+          <!-- Logout -->
+          <button class="btn-danger-ghost" style="width:100%;margin-top:6px;">
+            Sign Out
+          </button>
+
+          <div style="text-align:center;margin-top:14px;font-size:11px;color:#C7C7CC;">DormMate v1.0</div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><span class="nav-label">Home</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></div><span class="nav-label">Expenses</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.72L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5V2.05z"/></svg></div><span class="nav-label">Maintenance</span></div>
+        <div class="nav-item"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#C7C7CC" width="22" height="22"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg></div><span class="nav-label">Announce</span></div>
+        <div class="nav-item active"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="#5856D6" width="22" height="22"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><span class="nav-label" style="color:#5856D6;">Profile</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer note -->
+<div style="text-align:center;margin-top:44px;padding-bottom:20px;">
+  <p style="font-size:13px;color:#AEAEB2;">DormMate UI Mockup — iOS-inspired Glassmorphism · SRS v1.0</p>
+  <p style="font-size:11px;color:#C7C7CC;margin-top:4px;">Login · Home · Expenses · Maintenance · Create Request · Profile</p>
+</div>
+
+</body>
+</html>

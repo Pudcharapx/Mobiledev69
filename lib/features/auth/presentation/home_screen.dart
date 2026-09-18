@@ -5,7 +5,9 @@ import '../../../core/auth/auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/ambient_mesh_background.dart';
 import '../../../core/widgets/app_top_nav_bar.dart';
+import '../../../core/widgets/glass_container.dart';
 import '../../../core/widgets/pill_tab_bar.dart';
 
 /// Settings and profile screen per SRS.md sections 9.2 and 9.3 item 6.
@@ -25,22 +27,22 @@ class HomeScreen extends StatelessWidget {
         title: 'Settings',
         showBackButton: true,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Pill / Segmented Tab Bar (SRS 9.2)
-                const PillTabBar(currentRoute: '/profile'),
+      body: AmbientMeshBackground(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Pill / Segmented Tab Bar (SRS 9.2)
+                  const PillTabBar(currentRoute: '/profile'),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                // Appearance & Dark Mode Card (SRS 8.3 & 9.3 item 6)
-                Card(
-                  child: Padding(
+                  // Appearance & Dark Mode Card (SRS 8.3 & 9.3 item 6)
+                  GlassCard(
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +90,7 @@ class HomeScreen extends StatelessWidget {
                             if (themeService != null)
                               Switch(
                                 value: isDark,
-                                activeColor: AppColors.accent,
+                                activeThumbColor: AppColors.accent,
                                 onChanged: (value) {
                                   themeService.toggleDarkMode(value);
                                 },
@@ -123,147 +125,203 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+
+                const SizedBox(height: 16),
+
+                // Glassmorphism UI Showcase Card
+                GlassCard(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF6366F1), Color(0xFF06B6D4)],
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.auto_awesome_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Glassmorphism UI',
+                                  style: AppTypography.titleMedium,
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Frosted glass design with rounded corners & glow',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: GlassButton(
+                          onPressed: () => context.push('/glassmorphism'),
+                          icon: const Icon(Icons.preview_rounded, size: 18),
+                          label: 'Open Glassmorphism Showcase',
+                          accentColor: const Color(0xFF6366F1),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 16),
 
                 // Welcome Card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 28,
-                              backgroundColor: AppColors.accent,
-                              child: Text(
-                                (user?.username.isNotEmpty == true
-                                        ? user!.username[0]
-                                        : 'U')
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                GlassCard(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: AppColors.accent,
+                            child: Text(
+                              (user?.username.isNotEmpty == true
+                                      ? user!.username[0]
+                                      : 'U')
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome, ${user?.username ?? "User"}',
+                                  style: AppTypography.headlineLarge,
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Welcome, ${user?.username ?? "User"}',
-                                    style: AppTypography.headlineLarge,
+                                const SizedBox(height: 4),
+                                Text(
+                                  user?.email ?? 'OIDC Authenticated User',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? AppColors.textSecondaryDark
+                                        : AppColors.textSecondaryLight,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    user?.email ?? 'OIDC Authenticated User',
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? AppColors.textSecondaryDark
-                                          : AppColors.textSecondaryLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(height: 32),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.check_circle_rounded,
-                              color: AppColors.heatmapOptimal,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'OIDC Session Active & Persisted in Secure Storage',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
                                 ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 32),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: AppColors.heatmapOptimal,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'OIDC Session Active & Persisted in Secure Storage',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // Workout Logs Navigation Card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Workout Tracking',
-                          style: AppTypography.titleMedium,
+                GlassCard(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Workout Tracking',
+                        style: AppTypography.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Manage your exercise sessions, sets, reps, and weights.',
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Manage your exercise sessions, sets, reps, and weights.',
-                          style: TextStyle(
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
-                          ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: GlassButton(
+                          onPressed: () => context.push('/workouts'),
+                          icon: const Icon(Icons.list_alt_rounded, size: 18),
+                          label: 'View Workout Logs',
+                          accentColor: isDark
+                              ? const Color(0xFF6366F1)
+                              : const Color(0xFF1E293B),
                         ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () => context.push('/workouts'),
-                            icon: const Icon(Icons.list_alt_rounded),
-                            label: const Text('View Workout Logs'),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // Session details card
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Authentication Details',
-                          style: AppTypography.titleMedium,
-                        ),
-                        const SizedBox(height: 16),
-                        _DetailRow(
-                          label: 'Subject / User ID',
-                          value: user?.userId ?? 'Unknown',
-                        ),
-                        _DetailRow(
-                          label: 'Username',
-                          value: user?.username ?? 'Unknown',
-                        ),
-                        _DetailRow(
-                          label: 'Email',
-                          value: user?.email ?? 'Not provided',
-                        ),
-                        const _DetailRow(
-                          label: 'Auth Flow',
-                          value: 'Authorization Code + PKCE',
-                        ),
-                      ],
-                    ),
+                GlassCard(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Authentication Details',
+                        style: AppTypography.titleMedium,
+                      ),
+                      const SizedBox(height: 16),
+                      _DetailRow(
+                        label: 'Subject / User ID',
+                        value: user?.userId ?? 'Unknown',
+                      ),
+                      _DetailRow(
+                        label: 'Username',
+                        value: user?.username ?? 'Unknown',
+                      ),
+                      _DetailRow(
+                        label: 'Email',
+                        value: user?.email ?? 'Not provided',
+                      ),
+                      const _DetailRow(
+                        label: 'Auth Flow',
+                        value: 'Authorization Code + PKCE',
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -282,6 +340,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

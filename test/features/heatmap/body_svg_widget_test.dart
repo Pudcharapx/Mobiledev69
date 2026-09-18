@@ -61,6 +61,33 @@ void main() {
     expect(tappedGroup, 'chest');
   });
 
+  testWidgets('BodySvgWidget renders without overflow on narrow 236px width',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: Center(
+              child: SizedBox(
+                width: 236,
+                child: BodySvgWidget(
+                  volumeData: sampleVolumeData,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // No overflow exceptions should occur and all legend items should be present
+    expect(find.text('<50% Under'), findsOneWidget);
+    expect(find.text('50-79% Moderate'), findsOneWidget);
+    expect(find.text('80%+ Target Met'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('MuscleZoneDetailPopup displays volume and contributing logs',
       (tester) async {
     final vm = WorkoutViewModel(

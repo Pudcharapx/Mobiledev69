@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "oidc_provider",
     "workout",
+    "dormmate",
 ]
 
 MIDDLEWARE = [

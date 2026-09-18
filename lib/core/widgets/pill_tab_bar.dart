@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
+import 'glass_container.dart';
 
 /// Pill/segmented control tab switcher per SRS.md section 9.2:
 /// "rounded capsule tab switcher, selected tab shown as black background with white text — used to switch between 'Heatmap / Log List / Settings'"
@@ -23,17 +24,12 @@ class PillTabBar extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
+    return GlassContainer(
       height: 48,
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          width: 1,
-        ),
-      ),
+      borderRadius: 30,
+      blur: 16.0,
+      borderWidth: 1.2,
       child: Row(
         children: _tabs.map((tab) {
           final isSelected = _isRouteSelected(tab.route);

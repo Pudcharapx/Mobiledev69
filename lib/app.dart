@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
 import 'core/auth/auth_service.dart';
 import 'core/auth/token_storage.dart';
+import 'core/services/rest_timer_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_service.dart';
+import 'core/widgets/floating_glass_rest_timer.dart';
 import 'features/heatmap/data/exercise_repository.dart';
 import 'features/workout/data/workout_repository.dart';
 import 'features/workout/presentation/workout_view_model.dart';
@@ -35,6 +37,7 @@ class _MuscleHeatmapAppState extends State<MuscleHeatmapApp> {
   late final ExerciseRepository _exerciseRepository;
   late final WorkoutRepository _workoutRepository;
   late final ThemeService _themeService;
+  late final RestTimerService _restTimerService;
 
   @override
   void initState() {
@@ -42,10 +45,17 @@ class _MuscleHeatmapAppState extends State<MuscleHeatmapApp> {
     _router = AppRouter.createRouter(widget.authService);
     _exerciseRepository = ExerciseRepository(apiClient: widget.apiClient);
     _workoutRepository = WorkoutRepository(apiClient: widget.apiClient);
+    _restTimerService = RestTimerService();
     _themeService = widget.themeService ?? ThemeService();
     if (!_themeService.isInitialized) {
       _themeService.initialize();
     }
+  }
+
+  @override
+  void dispose() {
+    _restTimerService.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,6 +64,7 @@ class _MuscleHeatmapAppState extends State<MuscleHeatmapApp> {
       providers: [
         ChangeNotifierProvider<AuthService>.value(value: widget.authService),
         ChangeNotifierProvider<ThemeService>.value(value: _themeService),
+        ChangeNotifierProvider<RestTimerService>.value(value: _restTimerService),
         Provider<ApiClient>.value(value: widget.apiClient),
         Provider<TokenStorage>.value(value: widget.tokenStorage),
         Provider<ExerciseRepository>.value(value: _exerciseRepository),
@@ -74,6 +85,14 @@ class _MuscleHeatmapAppState extends State<MuscleHeatmapApp> {
             darkTheme: AppTheme.darkTheme,
             themeMode: themeService.themeMode,
             routerConfig: _router,
+            builder: (context, child) {
+              return Stack(
+                children: [
+                  if (child != null) child,
+                  const FloatingGlassRestTimer(),
+                ],
+              );
+            },
           );
         },
       ),

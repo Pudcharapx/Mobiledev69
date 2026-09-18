@@ -4,6 +4,7 @@ import '../../auth/presentation/callback_screen.dart';
 import '../../auth/presentation/home_screen.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../heatmap/presentation/heatmap_screen.dart';
+import '../../showcase/glassmorphism_showcase_screen.dart';
 import '../presentation/log_form.dart';
 import '../presentation/log_screen.dart';
 
@@ -71,6 +72,11 @@ class AppRouter {
           path: '/profile',
           name: 'profile',
           builder: (context, state) => const HomeScreen(),
+        ),
+        GoRoute(
+          path: '/glassmorphism',
+          name: 'glassmorphism',
+          builder: (context, state) => const GlassmorphismShowcaseScreen(),
         ),
         GoRoute(
           path: '/settings',

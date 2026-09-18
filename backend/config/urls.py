@@ -10,5 +10,6 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("api/", include("workout.urls")),
+    path("api/dormmate/", include("dormmate.urls")),
     path("", include("oidc_provider.urls", namespace="oidc_provider")),
 ]

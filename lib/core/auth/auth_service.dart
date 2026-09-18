@@ -58,18 +58,38 @@ class AuthService extends ChangeNotifier {
     return _oidcClient!;
   }
 
+  /// Get effective redirect URI for web (respects current host/port if available).
+  Uri get effectiveRedirectUri {
+    if (kIsWeb && Uri.base.scheme.startsWith('http')) {
+      return Uri(
+        scheme: Uri.base.scheme,
+        host: Uri.base.host,
+        port: Uri.base.hasPort ? Uri.base.port : null,
+        path: '/callback',
+      );
+    }
+    return _config.redirectUri;
+  }
+
   /// Start OIDC Authorization Code Flow + PKCE redirect.
   Future<void> startLogin() async {
     final client = await getClient();
-    platform_auth.authorizeBrowser(client, _config.scopes);
+    platform_auth.authorizeBrowser(
+      client,
+      _config.scopes,
+      redirectUri: effectiveRedirectUri,
+    );
   }
 
   /// Handle callback on redirect URL, retrieve token credential, and save to storage.
   Future<UserSession?> handleCallback() async {
     try {
       final client = await getClient();
-      final credential =
-          await platform_auth.authenticateBrowser(client, _config.scopes);
+      final credential = await platform_auth.authenticateBrowser(
+        client,
+        _config.scopes,
+        redirectUri: effectiveRedirectUri,
+      );
       if (credential == null) return null;
 
       final tokenResponse = await credential.getTokenResponse();

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -28,15 +29,27 @@ class MuscleZoneDetailPopup extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final vm = context.read<WorkoutViewModel>();
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.75,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
+          decoration: BoxDecoration(
+            color: (isDark ? AppColors.surfaceDark : Colors.white)
+                .withValues(alpha: isDark ? 0.82 : 0.88),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border(
+              top: BorderSide(
+                color: (isDark ? Colors.white : Colors.white)
+                    .withValues(alpha: isDark ? 0.20 : 0.60),
+                width: 1.2,
+              ),
+            ),
+          ),
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
@@ -226,6 +239,8 @@ class MuscleZoneDetailPopup extends StatelessWidget {
           ),
         ],
       ),
+    ),
+    ),
     );
   }
 }

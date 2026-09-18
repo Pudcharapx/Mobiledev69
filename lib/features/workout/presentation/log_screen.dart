@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../../core/services/rest_timer_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/ambient_mesh_background.dart';
 import '../../../core/widgets/app_top_nav_bar.dart';
+import '../../../core/widgets/glass_container.dart';
 import '../../../core/widgets/pill_tab_bar.dart';
+import '../domain/one_rep_max_calculator.dart';
 import '../domain/workout_log.dart';
 import 'log_form.dart';
+import 'routine_templates_sheet.dart';
 import 'workout_view_model.dart';
 
 /// LogScreen displaying list of all workout logs (sorted by date) with CRUD actions
@@ -101,6 +106,16 @@ class _LogScreenState extends State<LogScreen> {
         title: 'Workout Logs',
         extraActions: [
           IconButton(
+            icon: const Icon(Icons.timer_outlined),
+            tooltip: 'Rest Timer',
+            onPressed: () {
+              final timer = context.read<RestTimerService>();
+              if (!timer.isVisible) {
+                timer.startTimer(60);
+              }
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () => vm.loadInitialData(),
@@ -114,65 +129,68 @@ class _LogScreenState extends State<LogScreen> {
         backgroundColor: isDark ? Colors.white : AppColors.primary,
         foregroundColor: isDark ? AppColors.backgroundDark : Colors.white,
       ),
-      body: RefreshIndicator(
-        onRefresh: () => vm.loadInitialData(),
-        child: vm.isLoading && vm.logs.isEmpty
-            ? const Center(child: CircularProgressIndicator())
-            : vm.logs.isEmpty
-                ? Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-                        child: PillTabBar(currentRoute: '/workouts'),
-                      ),
-                      Expanded(
-                        child: _EmptyLogsState(
-                          onAddPressed: () => context.push('/workouts/new'),
-                        ),
-                      ),
-                    ],
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    itemCount: vm.logs.length + 2, // 0: PillTabBar, 1: Summary Card, rest: logs
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return const Padding(
-                          padding: EdgeInsets.only(bottom: 16),
+      body: AmbientMeshBackground(
+        child: RefreshIndicator(
+          onRefresh: () => vm.loadInitialData(),
+          child: vm.isLoading && vm.logs.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : vm.logs.isEmpty
+                  ? Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
                           child: PillTabBar(currentRoute: '/workouts'),
-                        );
-                      }
+                        ),
+                        Expanded(
+                          child: _EmptyLogsState(
+                            onAddPressed: () => context.push('/workouts/new'),
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      itemCount: vm.logs.length + 3, // 0: PillTabBar, 1: Summary Card, 2: Routine Card, rest: logs
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return const Padding(
+                            padding: EdgeInsets.only(bottom: 16),
+                            child: PillTabBar(currentRoute: '/workouts'),
+                          );
+                        }
 
-                      if (index == 1) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Card(
-                            child: Padding(
+                        if (index == 1) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: GlassCard(
                               padding: const EdgeInsets.all(20),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        '${vm.logs.length}',
-                                        style: AppTypography.statNumberLarge,
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Logged Exercises',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark
-                                              ? AppColors.textSecondaryDark
-                                              : AppColors.textSecondaryLight,
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '${vm.logs.length}',
+                                          style: AppTypography.statNumberLarge,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Logged Exercises',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? AppColors.textSecondaryDark
+                                                : AppColors.textSecondaryLight,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Container(
                                     height: 40,
@@ -181,38 +199,114 @@ class _LogScreenState extends State<LogScreen> {
                                         ? AppColors.borderDark
                                         : AppColors.borderLight,
                                   ),
-                                  Column(
-                                    children: [
-                                      Text(
-                                        '$totalSets',
-                                        style: AppTypography.statNumberLarge,
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Total Sets',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark
-                                              ? AppColors.textSecondaryDark
-                                              : AppColors.textSecondaryLight,
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '$totalSets',
+                                          style: AppTypography.statNumberLarge,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Total Sets',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? AppColors.textSecondaryDark
+                                                : AppColors.textSecondaryLight,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        );
-                      }
+                          );
+                        }
 
-                      final log = vm.logs[index - 2];
+                        if (index == 2) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: GlassCard(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withValues(alpha: 0.15),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.bolt_rounded,
+                                      size: 20,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Workout Routines',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Push, Pull, Legs & Upper presets',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: isDark
+                                                ? AppColors.textSecondaryDark
+                                                : AppColors.textSecondaryLight,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 8,
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    onPressed: () => RoutineTemplatesSheet.show(context),
+                                    child: const Text(
+                                      'Explore',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                      final log = vm.logs[index - 3];
                       final exercise = vm.getExerciseById(log.exerciseId);
 
                       // Check if date header should be shown (grouped by day)
-                      final showDateHeader = (index - 2) == 0 ||
-                          !_isSameDay(log.date, vm.logs[index - 3].date);
+                      final showDateHeader = (index - 3) == 0 ||
+                          !_isSameDay(log.date, vm.logs[index - 4].date);
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,123 +330,223 @@ class _LogScreenState extends State<LogScreen> {
                               ),
                             ),
                           ],
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(18),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  // Exercise Icon / Muscle Badge
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? AppColors.primaryLight
-                                          : AppColors.borderLight,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: const Icon(
-                                      Icons.fitness_center_rounded,
-                                      size: 24,
-                                    ),
+                          GlassCard(
+                            padding: const EdgeInsets.all(18),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Exercise Icon / Muscle Badge
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.primaryLight
+                                        : AppColors.borderLight,
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
-                                  const SizedBox(width: 14),
+                                  child: const Icon(
+                                    Icons.fitness_center_rounded,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
 
-                                  // Exercise Info & Volume
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          exercise?.name ?? 'Exercise #${log.exerciseId}',
-                                          style: AppTypography.titleMedium,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '${log.sets} sets × ${log.reps} reps',
+                                // Exercise Info & Volume
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              exercise?.name ??
+                                                  'Exercise #${log.exerciseId}',
+                                              style: AppTypography.titleMedium,
+                                            ),
+                                          ),
+                                          if (vm.isPRLog(log)) ...[
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFFFD700)
+                                                    .withValues(alpha: 0.15),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: const Color(0xFFFFD700)
+                                                      .withValues(alpha: 0.6),
+                                                  width: 0.8,
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                '🏆 PR',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Color(0xFFFFD700),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        spacing: 6,
+                                        runSpacing: 4,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: (exercise?.primaryMuscle != null
+                                                      ? AppColors.accent
+                                                      : AppColors.heatmapDefault)
+                                                  .withValues(alpha: 0.15),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              (exercise?.primaryMuscle ?? 'General')
+                                                  .toUpperCase(),
                                               style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w700,
+                                                color: exercise?.primaryMuscle != null
+                                                    ? AppColors.accent
+                                                    : (isDark
+                                                        ? AppColors.textSecondaryDark
+                                                        : AppColors.textSecondaryLight),
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${log.sets} sets \u00d7 ${log.reps} reps',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: isDark
+                                                  ? AppColors.textSecondaryDark
+                                                  : AppColors.textSecondaryLight,
+                                            ),
+                                          ),
+                                          if (log.weightKg != null) ...[
+                                            Text(
+                                              ' @ ${log.weightKg}kg',
+                                              style: TextStyle(
+                                                fontSize: 13,
                                                 fontWeight: FontWeight.w600,
                                                 color: isDark
                                                     ? AppColors.textPrimaryDark
                                                     : AppColors.textPrimaryLight,
                                               ),
                                             ),
-                                            if (log.weightKg != null) ...[
-                                              const Text(' • '),
-                                              Text(
-                                                '${log.weightKg} kg',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.accent,
-                                                ),
+                                            Text(
+                                              '(1RM ~${OneRepMaxCalculator.calculate1RM(log.weightKg!, log.reps)}kg)',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: isDark
+                                                    ? AppColors.textSecondaryDark
+                                                    : AppColors.textSecondaryLight,
                                               ),
-                                            ],
-                                          ],
-                                        ),
-                                        if (log.note != null &&
-                                            log.note!.isNotEmpty) ...[
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            log.note!,
-                                            style: theme.textTheme.bodyMedium?.copyWith(
-                                              fontStyle: FontStyle.italic,
-                                              color: isDark
-                                                  ? AppColors.textSecondaryDark
-                                                  : AppColors.textSecondaryLight,
                                             ),
-                                          ),
+                                          ],
                                         ],
+                                      ),
+                                      if (log.note != null && log.note!.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          log.note!,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic,
+                                            color: isDark
+                                                ? AppColors.textSecondaryDark
+                                                : AppColors.textSecondaryLight,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ],
-                                    ),
-                                  ),
-
-                                  // Action Buttons (Edit / Delete)
-                                  PopupMenuButton<String>(
-                                    icon: const Icon(Icons.more_vert_rounded),
-                                    onSelected: (value) {
-                                      if (value == 'edit') {
-                                        _openEditForm(log);
-                                      } else if (value == 'delete') {
-                                        _confirmDelete(log);
-                                      }
-                                    },
-                                    itemBuilder: (context) => [
-                                      const PopupMenuItem(
-                                        value: 'edit',
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.edit_outlined, size: 18),
-                                            SizedBox(width: 8),
-                                            Text('Edit'),
-                                          ],
-                                        ),
-                                      ),
-                                      const PopupMenuItem(
-                                        value: 'delete',
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.delete_outline,
-                                                size: 18, color: Colors.redAccent),
-                                            SizedBox(width: 8),
-                                            Text('Delete',
-                                                style: TextStyle(color: Colors.redAccent)),
-                                          ],
-                                        ),
-                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+
+                                // Calculated Volume Badge per SRS 8.1
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.accent.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '+${(log.sets * log.reps * (log.weightKg ?? 1.0)).round()} vol',
+                                    style: const TextStyle(
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 4),
+
+                                // More Menu (Edit / Delete) per SRS 7.4 & 7.5
+                                PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert_rounded),
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      _openEditForm(log);
+                                    } else if (value == 'delete') {
+                                      _confirmDelete(log);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit_outlined, size: 18),
+                                          SizedBox(width: 8),
+                                          Text('Edit'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete_outline,
+                                              size: 18, color: Colors.redAccent),
+                                          SizedBox(width: 8),
+                                          Text('Delete',
+                                              style: TextStyle(color: Colors.redAccent)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       );
                     },
                   ),
+        ),
       ),
     );
   }
@@ -404,6 +598,12 @@ class _EmptyLogsState extends StatelessWidget {
               onPressed: onAddPressed,
               icon: const Icon(Icons.add_rounded),
               label: const Text('Log First Workout'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () => RoutineTemplatesSheet.show(context),
+              icon: const Icon(Icons.bolt_rounded),
+              label: const Text('Explore Preset Routines (Push/Pull/Legs)'),
             ),
           ],
         ),

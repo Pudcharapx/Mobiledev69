@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -39,13 +40,24 @@ class AppTopNavBar extends StatelessWidget implements PreferredSizeWidget {
 
     return SafeArea(
       bottom: false,
-      child: Container(
-        height: 64,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor,
-        ),
-        child: Row(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            height: 64,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: (isDark ? AppColors.backgroundDark : Colors.white)
+                  .withValues(alpha: isDark ? 0.75 : 0.80),
+              border: Border(
+                bottom: BorderSide(
+                  color: (isDark ? Colors.white : Colors.black)
+                      .withValues(alpha: isDark ? 0.08 : 0.05),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
           children: [
             // Circular back button or Circular App Icon on the left (SRS 9.2)
             if (shouldShowBack)
@@ -157,9 +169,11 @@ class AppTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
+    ),
     );
   }
 }
@@ -193,10 +207,14 @@ class _CircularIconButton extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isDark ? AppColors.surfaceDark : Colors.white,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.10)
+                  : Colors.white.withValues(alpha: 0.75),
               border: Border.all(
-                color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                width: 1.5,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.20)
+                    : Colors.black.withValues(alpha: 0.08),
+                width: 1.2,
               ),
             ),
             child: Icon(

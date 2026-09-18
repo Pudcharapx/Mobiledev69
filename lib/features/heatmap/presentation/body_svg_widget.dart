@@ -187,16 +187,25 @@ class BodySvgWidget extends StatelessWidget {
 
         // Color Legend Bar (SRS 8.1: red -> yellow -> green)
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.white.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : Colors.white.withValues(alpha: 0.8),
+              width: 1.2,
             ),
           ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: const Wrap(
+            alignment: WrapAlignment.spaceAround,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
             children: [
               _LegendItem(
                 color: AppColors.heatmapUnderTrained,

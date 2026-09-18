@@ -1,248 +1,345 @@
-# Muscle Heatmap Workout Tracker
+# DormMate
 
-A mobile workout tracking application that visualizes weekly resistance training volume as an interactive **Muscle Heatmap** — a front and back body diagram that color-codes muscle groups based on weekly training intensity (red = under-trained, green = target met), combined with an automated **Muscle Imbalance Alert** system.
+DormMate is an enterprise-grade mobile application designed for dormitory and student residence management. It centralizes essential residential services into a unified digital experience, including utility billing with PromptPay QR generation, maintenance ticket tracking, parcel delivery notifications, amenity scheduling, and official administrative announcements.
 
-> **Citation & Source Attribution**:
-> Muscle mappings and exercise contribution weightings are based on publicly available general fitness references from [ExRx.net](https://exrx.net) per SRS.md sections 4.1, 6, and 10.
-
----
-
-## 1. Project Name & Description
-
-**Muscle Heatmap Workout Tracker** is a single-user mobile application built for people who perform regular resistance/weight training. Existing fitness applications typically represent training progress as plain tabular numbers or bar charts, making it difficult to assess overall balance. This application solves that problem by:
-- Visualizing weekly training volume directly onto an interactive front and back human body SVG map.
-- Normalizing volume against weekly goals using a red $\to$ amber $\to$ green completion gradient.
-- Detecting opposing muscle imbalances (e.g. chest vs. back, quads vs. hamstrings, biceps vs. triceps) and surfacing alerts when volume disparity exceeds 40%.
-- Delivering a fast, 3-tap logging UX with steppers and smart defaults that pre-fill weights from the previous workout.
+The application is engineered strictly around the Model-View-ViewModel (MVVM) architecture with the Repository pattern and Service layer separation, ensuring strict decoupling, dependency injection via constructors, and comprehensive automated testability.
 
 ---
 
-## 2. Features
+## Table of Contents
 
-All features listed below are fully implemented and verified with zero errors:
-
-1. **OIDC Authentication & Route Guarding** (SRS 3.2, 7.1):
-   - Authorization Code Flow with PKCE against a self-hosted Django OIDC server (`django-oidc-provider`, RS256).
-   - Secure token storage using `flutter_secure_storage`.
-   - Persistent session across application restarts and complete session clearance on sign out.
-   - Declarative route guarding via `go_router` blocking unauthorized access.
-
-2. **Workout Logging CRUD with MVVM Architecture** (SRS 3.1, 5, 7):
-   - Full Create, Read, Update, and Delete actions scoped strictly to the authenticated user.
-   - Dropdown selection of 18 pre-seeded baseline exercises covering all major muscle groups.
-   - Stepper (+/-) input for sets and reps (no typing required).
-   - Numeric keypad for weight pre-filled with the last logged value for that exercise (Smart Defaults).
-   - Date-grouped log list with floating action button and friendly SnackBar error handling.
-
-3. **Interactive Muscle Heatmap** (SRS 8.1):
-   - Front and back human body views rendered via `flutter_svg`, divided into 9 muscle zones: `chest`, `back`, `shoulders`, `biceps`, `triceps`, `legs`, `hamstrings`, `glutes`, and `core`.
-   - Calculates weekly volume per muscle group using the exact formula:
-     $$\text{volume}(X) = \sum (\text{sets} \times \text{reps} \times \text{contribution\_weight}[X])$$
-   - Color mapping along a Red ($<50\%$) $\to$ Amber ($50\text{--}79\%$) $\to$ Green ($80\text{--}120\%$) gradient.
-   - Tap-to-inspect popup dialog showing all contributing logs for any selected muscle zone.
-
-4. **Muscle Imbalance Alert** (SRS 8.2):
-   - Evaluates exactly the 3 opposing pairs from SRS section 6:
-     - `chest` vs `back`
-     - `legs (quads)` vs `hamstrings`
-     - `biceps` vs `triceps`
-   - Numeric comparison triggering an alert when volume disparity exceeds $40\%$:
-     $$\text{diff} = \frac{\max(V_A, V_B) - \min(V_A, V_B)}{\max(V_A, V_B)} > 0.40$$
-   - Formatted alert messages in SRS 8.2 style:
-     `"Your {undertrained} is undertrained compared to your {overtrained} — consider adding more {undertrained} work"`.
-
-5. **Card-Based Visual Aesthetic** (SRS 9.2):
-   - **Dark Feature Card**: Highlights active imbalance alerts with volume comparison bars and action buttons.
-   - **Circular Progress Ring**: Displays overall weekly balance percentage in the center.
-   - **Pill / Segmented Tab Switcher**: Capsule tab bar switching between `Heatmap`, `Log List`, and `Settings`.
-   - **Consistent Top Navigation**: Circular back button on the left, calendar icon and round profile photo on the right.
-   - Large rounded cards ($20\text{px}$ radius) with generous padding throughout.
-
-6. **Dark Mode with Saved Preference** (SRS 8.3, 9.3 item 6):
-   - Toggle between Light, Dark, and System modes in the Settings screen.
-   - Selected theme preference is saved to secure storage and restored on cold app startup.
+- [1. Executive Summary](#1-executive-summary)
+- [2. System Architecture](#2-system-architecture)
+- [3. Core Functional Modules](#3-core-functional-modules)
+- [4. Technology Stack](#4-technology-stack)
+- [5. System Requirements](#5-system-requirements)
+- [6. Installation and Setup Guide](#6-installation-and-setup-guide)
+- [7. Demonstration Credentials](#7-demonstration-credentials)
+- [8. REST API Specification](#8-rest-api-specification)
+- [9. Automated Testing and Quality Assurance](#9-automated-testing-and-quality-assurance)
+- [10. Directory Structure](#10-directory-structure)
+- [11. License and Attributions](#11-license-and-attributions)
 
 ---
 
-## 3. Tech Stack
+## 1. Executive Summary
 
-### Frontend (Flutter)
-- **Framework**: Flutter 3.32+ / Dart 3.8+
-- **Architecture**: MVVM (Model-View-ViewModel) + Repository Pattern + Result Pattern
-- **State Management & DI**: `provider` (^6.1.2)
-- **Navigation & Route Guard**: `go_router` (^14.8.1)
+Dormitory residents frequently encounter fragmented communication channels, manual paper billing for utilities, and opaque maintenance request workflows. DormMate addresses these operational inefficiencies by providing:
+
+- Real-time room occupancy and contract status visibility.
+- Itemized utility tracking (electricity, water, internet, and facility surcharges) with automated PromptPay QR generation.
+- Full lifecycle maintenance ticketing (submission, status progression, and cancellation).
+- Administrative announcement distribution with category filtering and read state management.
+- Shared facility and laundry machine availability tracking.
+- Secure package delivery tracking with access PIN codes.
+- OpenID Connect (OIDC) authentication with Authorization Code Flow and PKCE.
+- Modern iOS-inspired glassmorphism user interface with dynamic theme presets and system-wide dark mode support.
+
+---
+
+## 2. System Architecture
+
+DormMate implements a decoupled four-tier architecture designed for maintainability, predictable state progression, and complete isolation of concerns.
+
+```
++-------------------------------------------------------------------------+
+|                               VIEW LAYER                                |
+|  Screens, Dialogs, Sheets, Reusable Glass Containers, Navigation Shell |
++-------------------------------------------------------------------------+
+                                    |
+                                    v (User Actions / State Listeners)
++-------------------------------------------------------------------------+
+|                            VIEWMODEL LAYER                              |
+|  ChangeNotifier implementations managing reactive UI state and business |
+|  validation. ViewModels never import network or storage primitives.    |
++-------------------------------------------------------------------------+
+                                    |
+                                    v (Constructor Injection)
++-------------------------------------------------------------------------+
+|                           REPOSITORY LAYER                              |
+|  Abstract contracts and concrete implementations mediating data between |
+|  remote APIs, local caches, and domain entity models.                   |
++-------------------------------------------------------------------------+
+                                    |
+                                    v (Constructor Injection)
++-------------------------------------------------------------------------+
+|                            SERVICE LAYER                                |
+|  Stateless network clients (Dio), secure keystore managers, and OIDC    |
+|  protocol orchestrators (PKCE, token refreshing).                       |
++-------------------------------------------------------------------------+
+```
+
+### Architectural Principles
+
+1. **Model-View-ViewModel (MVVM)**: Views observe ViewModels through the `provider` package (`ChangeNotifierProvider` and `ListenableBuilder`). Business rules and state mutations reside exclusively within ViewModels.
+2. **Repository Pattern**: ViewModels interact only with repository interfaces (`RoomRepository`, `ExpenseRepository`, `MaintenanceRepository`, etc.). This enables seamless swapping between production implementations and test doubles (`FakeRepository`).
+3. **Constructor-Based Dependency Injection**: Concrete service and repository instances are instantiated during application bootstrapping (`main.dart`) and injected downward via constructor parameters. Service locators and global mutable singletons are avoided.
+4. **State Machine Predictability**: ViewModels expose clear state indicators (`isLoading`, `errorMessage`, `isEmpty`) to render appropriate deterministic UI states (skeletons, empty states, retry views).
+
+---
+
+## 3. Core Functional Modules
+
+### 3.1 Authentication and Session Security
+- **OpenID Connect (OIDC)**: Standards-compliant Authorization Code Flow with Proof Key for Code Exchange (PKCE) against a Django OIDC identity provider.
+- **Token Persistence**: Access and refresh tokens are securely stored on-device using platform-native keystores via `flutter_secure_storage`.
+- **Route Guarding**: Declarative redirection rules configured within `go_router` prevent unauthenticated access to protected residential views.
+
+### 3.2 Resident Dashboard (Home)
+- **Room Information**: Displays room number, building, floor, room type, and occupancy state.
+- **Financial Status at a Glance**: Displays current billing cycle balance, due date, and payment status.
+- **Quick Actions**: Direct navigation shortcuts for logging maintenance issues, paying bills, checking laundry availability, and viewing parcel lockers.
+- **Notice Board Feed**: Highlights priority bulletins published by dormitory administration.
+
+### 3.3 Utility Billing and PromptPay Payment
+- **Itemized Breakdown**: Displays granular consumption records for electricity, water, internet, and recurring room rent.
+- **PromptPay QR Integration**: Generates EMVCo-compliant PromptPay QR payloads for instant peer-to-merchant domestic payments.
+- **Transaction History**: Retains past billing statements with status indicators (`Paid`, `Unpaid`).
+
+### 3.4 Maintenance Ticket Management (CRUD)
+- **Ticket Submission**: Form validation for issue title, category selection (Electrical, Plumbing, Air Conditioning, Furniture, Internet, Bathroom, General Cleaning), description, and urgency.
+- **Status Progression**: Tracks ticket lifecycle states from `Pending` to `In Progress`, `Completed`, or `Cancelled`.
+- **Cancellation**: Allows residents to cancel pending requests directly from the ticket detail screen.
+
+### 3.5 Administrative Announcements
+- **Search and Categorization**: Real-time client-side search across announcement headers and contents, with category chips.
+- **Read State Tracking**: Unread badge indicators and one-tap "Mark all as read" capability.
+
+### 3.6 Facility and Laundry Monitoring
+- **Appliance State Simulation**: Real-time operational status for washing machines and dryers (`Available`, `In Use`, `Maintenance`).
+- **Remaining Cycle Timers**: Displays remaining cycle durations for active appliances.
+- **Facility Availability**: Operational schedules for shared study rooms and fitness areas.
+
+### 3.7 Parcel Locker Tracking
+- **Delivery Ingestion**: Tracks arriving packages categorized by carrier and arrival timestamp.
+- **Pickup Verification**: Displays secure locker box numbers and one-time retrieval PIN codes.
+
+### 3.8 Personalization and Theme System
+- **Dynamic Glassmorphism**: Translucent frosted surfaces with customizable background mesh gradients.
+- **Theme Presets**: Multiple curated visual schemes (Classic Navy, Emerald Oasis, Royal Violet, Rose Quartz, Dark Slate).
+- **Mode Toggle**: Full support for Light, Dark, and System appearance modes with persistent local preferences.
+
+---
+
+## 4. Technology Stack
+
+### Client (Mobile and Web)
+- **Language**: Dart (v3.8 or newer)
+- **Framework**: Flutter (v3.24 or newer)
+- **State Management**: `provider` (^6.1.2)
+- **Declarative Routing**: `go_router` (^14.8.1)
 - **HTTP Client**: `dio` (^5.8.0)
-- **OIDC & PKCE**: `openid_client` (^0.4.10)
-- **Secure Token Storage**: `flutter_secure_storage` (^9.2.4)
-- **Vector Graphics**: `flutter_svg` (^2.0.17)
-- **Localization & Formatting**: `intl` (^0.20.2)
+- **Identity Protocol**: `openid_client` (^0.4.10)
+- **Encrypted Storage**: `flutter_secure_storage` (^9.2.4)
+- **Vector Assets**: `flutter_svg` (^2.0.17)
+- **Localization and Formatting**: `intl` (^0.20.2)
 
-### Backend (Django)
-- **Runtime**: Python 3.12+
-- **Dependency Management**: `uv`
-- **Framework**: Django 5.x
-- **REST API**: Django REST Framework (DRF)
-- **Authentication**: `django-oidc-provider` (OAuth 2.0 / OIDC Authorization Code Flow + PKCE, RS256)
-- **Database**: SQLite (pre-configured, auto-seeded on migrate)
-
----
-
-## 4. Prerequisites
-
-Install the following tools before running the application:
-
-1. **Git**: [https://git-scm.com/downloads](https://git-scm.com/downloads)
-2. **Flutter SDK** (v3.24 or newer): [https://docs.flutter.dev/get-started/install](https://docs.flutter.dev/get-started/install)
-3. **Python** (v3.12 or newer): [https://www.python.org/downloads/](https://www.python.org/downloads/)
-4. **uv** (Fast Python package manager): [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
-   - Windows PowerShell install: `irm https://astral.sh/uv/install.ps1 | iex`
-   - macOS / Linux install: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-5. **Google Chrome**: [https://www.google.com/chrome/](https://www.google.com/chrome/)
+### Server (Backend)
+- **Runtime**: Python (v3.12 or newer)
+- **Package Manager**: `uv` (Fast Python package resolver and virtual environment manager)
+- **Web Framework**: Django 5.x
+- **API Engine**: Django REST Framework (DRF)
+- **Identity Server**: `django-oidc-provider` (OAuth 2.0 / OIDC Authorization Code Flow with PKCE, RS256 cryptographic signing)
+- **Relational Database**: SQLite (Default development instance)
 
 ---
 
-## 5. How to Run
+## 5. System Requirements
 
-Follow these line-by-line terminal commands from a fresh terminal.
+Before setting up the environment, verify that the following dependencies are installed on your workstation:
 
-### 5.1 Clone & Checkout Branch
+1. **Git**: Distributed version control ([Download Git](https://git-scm.com/downloads))
+2. **Flutter SDK**: Version 3.24.0 or higher ([Install Flutter](https://docs.flutter.dev/get-started/install))
+3. **Python**: Version 3.12 or higher ([Install Python](https://www.python.org/downloads/))
+4. **uv**: High-performance Python package installer ([Install uv](https://docs.astral.sh/uv/getting-started/installation/))
+   - Windows (PowerShell):
+     ```powershell
+     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+     ```
+   - macOS / Linux:
+     ```bash
+     curl -LsSf https://astral.sh/uv/install.sh | sh
+     ```
+5. **Google Chrome**: Recommended target browser for Web client execution ([Download Chrome](https://www.google.com/chrome/))
+
+---
+
+## 6. Installation and Setup Guide
+
+Execute the following commands from clean shell sessions.
+
+### Step 1: Repository Clone
+
 ```bash
 git clone https://github.com/Pudcharapx/Mobiledev69.git
-cd Mobiledev69/project
+cd Mobiledev69
 git checkout project
 ```
 
-### 5.2 Start Backend Server (Terminal 1)
+### Step 2: Backend Setup and Database Initialization (Terminal 1)
+
+Navigate to the `backend/` directory, install virtual environment dependencies, apply migrations, seed initial data, and launch the development server:
+
 ```bash
 cd backend
+
+# Synchronize Python dependencies
 uv sync
+
+# Execute database migrations
 uv run python manage.py migrate
+
+# Initialize OIDC RSA keys and client registration
 uv run python manage.py bootstrap_oidc
+
+# Seed default DormMate rooms, residents, bills, and announcements
+uv run python manage.py bootstrap_dormmate
+
+# Start the Django REST API server on port 8000
 uv run python manage.py runserver 8000
 ```
-> The Django backend will start at `http://127.0.0.1:8000/`.
-> The `bootstrap_oidc` command automatically creates the OIDC Client, RS256 key, and the pre-configured demo account.
 
-### 5.3 Start Flutter Application (Terminal 2)
-In a new terminal window from the `project/` directory:
+The Django server will accept incoming HTTP requests at `http://127.0.0.1:8000/`.
+
+### Step 3: Frontend Client Execution (Terminal 2)
+
+From the project root directory (`Mobiledev69`), resolve Flutter dependencies and run the application:
+
 ```bash
+# Retrieve Flutter package dependencies
 flutter pub get
+
+# Launch Flutter Web in Google Chrome on port 50000
 flutter run -d chrome --web-port=50000
 ```
-> The application will open in Google Chrome at `http://localhost:50000`.
-> `--web-port=50000` matches the pre-registered OIDC redirect URI (`http://localhost:50000/callback`).
 
-### 5.4 Run Automated Tests (Optional)
+*Note: Port `50000` corresponds to the pre-authorized redirect URI registered in the OIDC client configuration (`http://localhost:50000/callback`).*
+
+To target a desktop or mobile emulator instead:
+
 ```bash
-# Run Django backend test suite (29 tests)
-cd backend
-uv run python manage.py test
+# List available platforms and emulators
+flutter devices
 
-# Run Flutter frontend test suite (47 tests)
-cd ..
+# Run on selected device target (e.g. Windows desktop)
+flutter run -d windows
+```
+
+---
+
+## 7. Demonstration Credentials
+
+The database bootstrapping command (`bootstrap_dormmate` and `bootstrap_oidc`) creates pre-seeded accounts configured with corresponding residential profiles:
+
+| Role | Username | Password | Email | Assigned Room | Room Type |
+|---|---|---|---|---|---|
+| Primary Resident | `demouser` | `demo12345` | `demo@example.com` | Room A-101 | Single |
+| Secondary Resident | `test` | `1234` | `test@example.com` | Room B-204 | Twin |
+
+---
+
+## 8. REST API Specification
+
+All endpoints are hosted under `/api/dormmate/` and expect JSON payloads.
+
+| HTTP Method | Endpoint Path | Description | Access Control |
+|---|---|---|---|
+| `POST` | `/api/dormmate/auth/login/` | Direct token authentication fallback | Public |
+| `GET` | `/api/dormmate/profile/` | Retrieve current resident personal details | Authenticated |
+| `GET` | `/api/dormmate/rooms/me/` | Retrieve resident room information and roommates | Authenticated |
+| `GET` | `/api/dormmate/expenses/` | List all utility and room billing records | Authenticated |
+| `GET` | `/api/dormmate/expenses/<id>/` | Retrieve granular itemized billing record | Authenticated |
+| `GET` | `/api/dormmate/maintenance/` | List resident maintenance tickets | Authenticated |
+| `POST` | `/api/dormmate/maintenance/` | Submit a new maintenance ticket | Authenticated |
+| `GET` | `/api/dormmate/maintenance/<id>/` | Retrieve maintenance ticket detail | Authenticated |
+| `DELETE` | `/api/dormmate/maintenance/<id>/` | Cancel a pending maintenance ticket | Authenticated |
+| `GET` | `/api/dormmate/announcements/` | Retrieve all administrative announcements | Authenticated |
+| `GET` | `/api/dormmate/announcements/<id>/` | Retrieve announcement details | Authenticated |
+| `GET` | `/api/dormmate/dashboard/` | Aggregated payload for the Home screen | Authenticated |
+
+---
+
+## 9. Automated Testing and Quality Assurance
+
+The codebase maintains strict verification coverage across both frontend and backend layers.
+
+### Frontend Test Suite (Flutter)
+
+The Flutter test suite encompasses unit tests for business models, fake repository state tests for ViewModels, and widget rendering verification for UI screens:
+
+```bash
+# Run all automated Flutter unit and widget tests
 flutter test
+
+# Run static analysis and lint rule enforcement
 flutter analyze
 ```
 
----
+Expected output:
+- **114 automated tests passed** with zero failures.
+- Static analyzer reports **0 issues**.
 
-## 6. Demo Account
+### Backend Test Suite (Django)
 
-Use this working OIDC user to log into the application:
-
-| Field | Value |
-|---|---|
-| **Username** | `demouser` |
-| **Password** | `demo12345` |
-| **Email** | `demo@example.com` |
-
-*Note: This account is automatically created when running `uv run python manage.py bootstrap_oidc`.*
-
----
-
-## 7. Screenshots
-
-### Screenshot 1: Heatmap Home & Muscle Imbalance Alert
-*Interactive front and back human body SVG map with muscle zone completion colors, circular progress ring, and dark feature card summarizing opposing muscle imbalances.*
-
-```
-+-----------------------------------------------------------+
-| (<-) Muscle Heatmap                  [Today]   [U Profile]|
-+-----------------------------------------------------------+
-|    [ Heatmap (active) ]   [ Log List ]   [ Settings ]     |
-|                                                           |
-| +-[ Muscle Imbalance Alert (Dark Feature Card) ]--------+ |
-| | [!] 1 opposing pair exceeds 40% volume difference     | |
-| | > Your back is undertrained compared to your chest    | |
-| |   chest: 200 vol  |  back: 80 vol (+60% diff)         | |
-| | [============ Add Workout to Balance ===============] | |
-| +-------------------------------------------------------+ |
-|                                                           |
-| +-[ Weekly Training Balance ]---------------------------+ |
-| |  ( 68% )  Weekly Volume: Sep 8 - Sep 14                | |
-| +-------------------------------------------------------+ |
-|                                                           |
-| +-[ Body Heatmap (Front + Back Views) ]-----------------+ |
-| |   [FRONT VIEW]                    [BACK VIEW]           |
-| |   Chest: 100% (Green)             Back: 40% (Red)       |
-| |   Legs: 80% (Green)               Hamstrings: 80%       |
-| +-------------------------------------------------------+ |
-+-----------------------------------------------------------+
-```
-
-### Screenshot 2: Workout Log Form (Sets/Reps Stepper & Smart Defaults)
-*Form showing dropdown exercise picker, sets & reps stepper controls, and numeric weight pre-filled with last logged values.*
-
-```
-+-----------------------------------------------------------+
-| (<-) New Workout Log                 [Today]   [U Profile]|
-+-----------------------------------------------------------+
-| +-[ Exercise Selection ]--------------------------------+ |
-| | Exercise: [ Bench Press                       v ]     | |
-| | Target muscles: chest + shoulders, triceps            | |
-| +-------------------------------------------------------+ |
-|                                                           |
-| +-[ Sets & Repetitions (Stepper Input) ]----------------+ |
-| | Sets:          [-]         4         [+]              |
-| | ----------------------------------------------------- | |
-| | Reps per Set:  [-]        10         [+]              |
-| +-------------------------------------------------------+ |
-|                                                           |
-| +-[ Weight & Notes ]------------------------------------+ |
-| | Weight: [ 70.0 ] kg (pre-filled from last session)    | |
-| | Notes:  [ Feeling strong, smooth reps ]               | |
-| +-------------------------------------------------------+ |
-|                                                           |
-| [================ Save Workout Log ===================]   |
-+-----------------------------------------------------------+
-```
-
-### Screenshot 3: Settings & Dark Mode Preference
-*Appearance settings with persistent Dark Mode toggle and OIDC session status.*
-
-```
-+-----------------------------------------------------------+
-| (<-) Settings                        [Today]   [U Profile]|
-+-----------------------------------------------------------+
-|    [ Heatmap ]   [ Log List ]   [ Settings (active) ]     |
-|                                                           |
-| +-[ Appearance ]----------------------------------------+ |
-| | [*] Dark mode with saved preference         [ ON / OFF] |
-| | Theme Mode: ( ) Light   (*) Dark   ( ) System           |
-| +-------------------------------------------------------+ |
-|                                                           |
-| +-[ Account Profile ]-----------------------------------+ |
-| | User: demouser (demo@example.com)                     | |
-| | [v] OIDC Session Active & Persisted in Secure Storage  | |
-| +-------------------------------------------------------+ |
-|                                                           |
-| [=================== Sign Out ========================]   |
-+-----------------------------------------------------------+
+```bash
+cd backend
+uv run python manage.py test
 ```
 
 ---
 
-## 8. Demo Video Link
+## 10. Directory Structure
 
-- **Video Demonstration Link**: [https://youtu.be/placeholder-demo-video](https://youtu.be/placeholder-demo-video)
-*(Placeholder link — will be updated with the recorded 5-minute video presentation covering fresh setup, OIDC login, workout CRUD, heatmap body rendering, and imbalance alerts per the course grading rubric).*
+```
+Mobiledev69/
+├── backend/
+│   ├── config/                     # Django core settings, URL routing, WSGI/ASGI
+│   │   ├── settings.py
+│   │   └── urls.py
+│   ├── dormmate/                   # DormMate REST API application
+│   │   ├── management/commands/    # Data bootstrap commands (bootstrap_dormmate)
+│   │   ├── migrations/             # Database schema migrations
+│   │   ├── models.py               # Room, Resident, Expense, Maintenance, Announcement
+│   │   ├── serializers.py          # DRF model serializers
+│   │   ├── urls.py                 # Endpoint routing rules
+│   │   └── views.py                # Class-based API view controllers
+│   ├── manage.py                   # Django CLI executable
+│   └── pyproject.toml              # uv Python environment and dependencies
+├── lib/
+│   ├── core/                       # Cross-cutting concerns
+│   │   ├── constants/              # Dimension, color, and string constants
+│   │   ├── routing/                # GoRouter declarative configuration
+│   │   ├── services/               # Shared device utilities
+│   │   ├── theme/                  # Theme presets, glassmorphism specs, ThemeService
+│   │   └── widgets/                # Reusable glass cards, mesh backgrounds, navbars
+│   ├── models/                     # Immutable domain data transfer objects (DTOs)
+│   ├── repositories/               # Repository interfaces and concrete implementations
+│   ├── services/                   # Stateless network and storage services
+│   ├── viewmodels/                 # ChangeNotifier MVVM controllers
+│   ├── views/                      # UI screens partitioned by domain feature
+│   │   ├── announcements/          # Announcement list, details, search
+│   │   ├── auth/                   # OIDC Login interface
+│   │   ├── expenses/               # Utility breakdowns and PromptPay QR sheets
+│   │   ├── facility/               # Laundry and shared amenity monitors
+│   │   ├── home/                   # Resident dashboard
+│   │   ├── maintenance/            # Ticket CRUD, forms, timeline status
+│   │   ├── parcels/                # Package arrival and locker PINs
+│   │   └── profile/                # Profile management and theme picker
+│   └── main.dart                   # Application entrypoint and dependency injection graph
+├── test/
+│   ├── core/                       # Theme and core widget unit tests
+│   ├── fake_repositories/          # In-memory test doubles for ViewModel testing
+│   ├── viewmodels/                 # ViewModel business logic and state tests
+│   ├── views/                      # Widget tests validating screen behavior
+│   └── dormmate_app_smoke_test.dart# End-to-end routing and provider smoke tests
+├── web/                            # Web platform bootstrapping, manifest, index.html
+├── pubspec.yaml                    # Flutter dependencies and asset registrations
+├── DormMate_SRS.md                 # Complete Software Requirements Specification
+└── README.md                       # Project technical documentation
+```
+
+---
+
+## 11. License and Attributions
+
+This project is developed for academic and demonstration purposes as part of the Mobile Application Development curriculum. All rights reserved.

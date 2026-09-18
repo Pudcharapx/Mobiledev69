@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import '../../heatmap/data/exercise_repository.dart';
 import '../data/workout_repository.dart';
 import '../domain/exercise.dart';
+import '../domain/one_rep_max_calculator.dart';
 import '../domain/workout_log.dart';
+import '../domain/workout_routine.dart';
 
 /// ViewModel managing state and business logic for the workout feature per SRS 3.1.
 class WorkoutViewModel extends ChangeNotifier {
@@ -192,8 +194,69 @@ class WorkoutViewModel extends ChangeNotifier {
     return null;
   }
 
+  /// Evaluates whether a new log constitutes a Personal Record.
+  PersonalRecordResult evaluatePR(WorkoutLog newLog) {
+    return OneRepMaxCalculator.checkPersonalRecord(
+      newLog: newLog,
+      existingLogs: _logs,
+    );
+  }
+
+  /// Determines if a specific log represents the current PR (max weight or max 1RM)
+  /// for its exercise.
+  bool isPRLog(WorkoutLog log) {
+    if (log.weightKg == null || log.weightKg! <= 0) return false;
+    final sameExerciseLogs = _logs
+        .where((l) =>
+            l.exerciseId == log.exerciseId &&
+            l.weightKg != null &&
+            l.weightKg! > 0)
+        .toList();
+    if (sameExerciseLogs.isEmpty) return false;
+
+    double maxWeight = 0.0;
+    for (final l in sameExerciseLogs) {
+      if (l.weightKg! > maxWeight) maxWeight = l.weightKg!;
+    }
+    return log.weightKg == maxWeight;
+  }
+
+  /// Batch log an entire routine's planned exercises.
+  Future<int> logRoutine(WorkoutRoutine routine) async {
+    _setLoading(true);
+    final now = DateTime.now();
+    int loggedCount = 0;
+
+    for (final item in routine.exercises) {
+      final lastLog = getLastLogForExercise(item.exerciseId);
+      final weight = lastLog?.weightKg ?? item.suggestedWeightKg;
+
+      final result = await _workoutRepository.createWorkoutLog(
+        exerciseId: item.exerciseId,
+        date: now,
+        sets: item.targetSets,
+        reps: item.targetReps,
+        weightKg: weight,
+        note: 'Completed routine: ${routine.name}',
+      );
+
+      result.when(
+        success: (created) {
+          _logs.insert(0, created);
+          loggedCount++;
+        },
+        failure: (_, __) {},
+      );
+    }
+
+    _logs.sort((a, b) => b.date.compareTo(a.date));
+    _setLoading(false);
+    return loggedCount;
+  }
+
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
   }
 }
+

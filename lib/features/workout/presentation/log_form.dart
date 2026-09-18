@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../../core/services/rest_timer_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/ambient_mesh_background.dart';
 import '../../../core/widgets/app_top_nav_bar.dart';
+import '../../../core/widgets/glass_container.dart';
 import '../domain/exercise.dart';
+import '../domain/one_rep_max_calculator.dart';
 import '../domain/workout_log.dart';
+import 'pr_celebration_dialog.dart';
 import 'workout_view_model.dart';
 
 /// Workout log create/edit form adhering to SRS.md section 5 input requirements:
@@ -15,8 +20,13 @@ import 'workout_view_model.dart';
 /// 3. Weight via numeric keypad, pre-filled with smart defaults from last log
 class LogForm extends StatefulWidget {
   final WorkoutLog? initialLog;
+  final Exercise? initialExercise;
 
-  const LogForm({super.key, this.initialLog});
+  const LogForm({
+    super.key,
+    this.initialLog,
+    this.initialExercise,
+  });
 
   @override
   State<LogForm> createState() => _LogFormState();
@@ -29,6 +39,7 @@ class _LogFormState extends State<LogForm> {
   late DateTime _selectedDate;
   int _sets = 3;
   int _reps = 10;
+  int _restSeconds = 60;
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   bool _isSaving = false;
@@ -61,6 +72,8 @@ class _LogFormState extends State<LogForm> {
       final vm = context.read<WorkoutViewModel>();
       if (widget.initialLog != null) {
         _selectedExercise = vm.getExerciseById(widget.initialLog!.exerciseId);
+      } else if (widget.initialExercise != null) {
+        _applyExerciseSelection(widget.initialExercise!, isInitial: true);
       } else if (vm.exercises.isNotEmpty) {
         _applyExerciseSelection(vm.exercises.first, isInitial: true);
       }
@@ -134,6 +147,18 @@ class _LogFormState extends State<LogForm> {
     final noteText = _noteController.text.trim();
     final note = noteText.isNotEmpty ? noteText : null;
 
+    final candidateLog = WorkoutLog(
+      id: widget.initialLog?.id ?? 0,
+      userId: widget.initialLog?.userId ?? 0,
+      exerciseId: _selectedExercise!.id,
+      date: _selectedDate,
+      sets: _sets,
+      reps: _reps,
+      weightKg: weight,
+      note: note,
+    );
+    final prResult = vm.evaluatePR(candidateLog);
+
     bool success;
     if (_isEditMode) {
       success = await vm.updateLog(
@@ -160,15 +185,51 @@ class _LogFormState extends State<LogForm> {
     setState(() => _isSaving = false);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_isEditMode
-              ? 'Workout log updated successfully.'
-              : 'Workout log saved successfully.'),
-          backgroundColor: AppColors.heatmapOptimal,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      final exerciseName = _selectedExercise!.name;
+      final restTimer = context.read<RestTimerService>();
+
+      if (!_isEditMode && prResult.isAnyPR) {
+        await PrCelebrationDialog.show(
+          context,
+          exerciseName: exerciseName,
+          prResult: prResult,
+          onStartRestTimer: _restSeconds > 0
+              ? () {
+                  restTimer.startTimer(
+                    _restSeconds,
+                    exerciseName: exerciseName,
+                  );
+                }
+              : null,
+        );
+        if (!mounted) return;
+        if (_restSeconds > 0 && !restTimer.isRunning) {
+          restTimer.startTimer(_restSeconds, exerciseName: exerciseName);
+        }
+      } else if (_restSeconds > 0) {
+        restTimer.startTimer(_restSeconds, exerciseName: exerciseName);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isEditMode
+                  ? 'Workout log updated. Rest timer started (${_restSeconds}s)!'
+                  : 'Workout log saved. Rest timer started (${_restSeconds}s)!',
+            ),
+            backgroundColor: AppColors.heatmapOptimal,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isEditMode
+                ? 'Workout log updated successfully.'
+                : 'Workout log saved successfully.'),
+            backgroundColor: AppColors.heatmapOptimal,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
       context.pop();
     } else {
       final error = vm.errorMessage ?? 'Failed to save workout log.';
@@ -194,19 +255,19 @@ class _LogFormState extends State<LogForm> {
         title: _isEditMode ? 'Edit Workout Log' : 'New Workout Log',
         showBackButton: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // 1. Exercise Picker Card (SRS 5.1: Dropdown / search, no free text)
-                  Card(
-                    child: Padding(
+      body: AmbientMeshBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 1. Exercise Picker Card (SRS 5.1: Dropdown / search, no free text)
+                    GlassCard(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +286,7 @@ class _LogFormState extends State<LogForm> {
                             )
                           else
                             DropdownButtonFormField<Exercise>(
-                              value: _selectedExercise,
+                              initialValue: _selectedExercise,
                               decoration: const InputDecoration(
                                 hintText: 'Select an exercise',
                                 prefixIcon: Icon(Icons.fitness_center_rounded),
@@ -234,7 +295,6 @@ class _LogFormState extends State<LogForm> {
                                 return DropdownMenuItem<Exercise>(
                                   value: ex,
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         ex.name,
@@ -243,14 +303,14 @@ class _LogFormState extends State<LogForm> {
                                       const SizedBox(width: 8),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
+                                          horizontal: 6,
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
                                           color: isDark
                                               ? AppColors.primaryLight
                                               : AppColors.borderLight,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
                                           ex.primaryMuscle,
@@ -286,12 +346,10 @@ class _LogFormState extends State<LogForm> {
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // 2. Stepper Card (SRS 5.2: Sets + Reps via Stepper +/-)
-                  Card(
-                    child: Padding(
+                    // 2. Stepper Card (SRS 5.2: Sets + Reps via Stepper +/-)
+                    GlassCard(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,12 +377,10 @@ class _LogFormState extends State<LogForm> {
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // 3. Weight Card (SRS 5.3: Numeric keypad + smart default)
-                  Card(
-                    child: Padding(
+                    // 3. Weight Card (SRS 5.3: Numeric keypad + smart default)
+                    GlassCard(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,6 +401,7 @@ class _LogFormState extends State<LogForm> {
                           const SizedBox(height: 12),
                           TextFormField(
                             controller: _weightController,
+                            onChanged: (_) => setState(() {}),
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
@@ -363,15 +420,66 @@ class _LogFormState extends State<LogForm> {
                               return null;
                             },
                           ),
+                          Builder(
+                            builder: (context) {
+                              final w = double.tryParse(_weightController.text.trim());
+                              if (w == null || w <= 0) return const SizedBox.shrink();
+                              final est1RM = OneRepMaxCalculator.calculate1RM(w, _reps);
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.primary.withValues(alpha: 0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.bolt_rounded,
+                                        size: 16,
+                                        color: AppColors.primary,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'Estimated 1RM: $est1RM kg',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '(Epley)',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: isDark
+                                              ? AppColors.textSecondaryDark
+                                              : AppColors.textSecondaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // 4. Date & Note Card
-                  Card(
-                    child: Padding(
+                    // 4. Date & Note Card
+                    GlassCard(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,34 +537,85 @@ class _LogFormState extends State<LogForm> {
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
-                  // Submit Button (SRS 5.3: 3-tap logging)
-                  SizedBox(
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _isSaving ? null : _saveLog,
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                    // 5. Rest Interval Card
+                    GlassCard(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.timer_outlined, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Rest Interval After Set',
+                                style: AppTypography.titleMedium,
                               ),
-                            )
-                          : Text(
-                              _isEditMode ? 'Update Log' : 'Save Workout Log',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            children: [0, 45, 60, 90, 120].map((seconds) {
+                              final isSelected = _restSeconds == seconds;
+                              final label = seconds == 0 ? 'Off' : '${seconds}s';
+                              return ChoiceChip(
+                                label: Text(label),
+                                selected: isSelected,
+                                onSelected: (sel) {
+                                  if (sel) setState(() => _restSeconds = seconds);
+                                },
+                                selectedColor: AppColors.primary,
+                                labelStyle: TextStyle(
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : (isDark ? Colors.white70 : AppColors.textPrimaryLight),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+
+                    // Submit Button (SRS 5.3: 3-tap logging)
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _isSaving ? null : _saveLog,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6366F1),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 4,
+                        ),
+                        child: _isSaving
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : Text(
+                                _isEditMode ? 'Update Log' : 'Save Workout Log',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
