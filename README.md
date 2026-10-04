@@ -258,7 +258,7 @@ The database bootstrapping command (`bootstrap_dormmate` and `bootstrap_oidc`) c
 
 ## 9. 🎬 Demonstration Video
 
-- **Video URL:** `[YouTube link — Unlisted]` *(e.g. `https://youtu.be/your_unlisted_video_id`)*
+- **Video URL:** [https://youtu.be/JkXWX4Gf0c8](https://youtu.be/JkXWX4Gf0c8)
 - **Duration:** 5–8 minutes
 - **Complete Storyboard & Script:** See [docs/SPEAKING_SCRIPT.md](docs/SPEAKING_SCRIPT.md) for the word-for-word presenter script and [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) for technical presentation criteria.
 
