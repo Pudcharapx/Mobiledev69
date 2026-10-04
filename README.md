@@ -1,6 +1,8 @@
 # DormMate
 
-![DormMate Overview](docs/screenshots/dormmate_hero.png)
+<p align="center">
+  <img src="docs/screenshots/home_screen.png" alt="DormMate Home Dashboard" width="340" />
+</p>
 
 DormMate is an enterprise-grade mobile application designed for dormitory and student residence management. It centralizes essential residential services into a unified digital experience, including utility billing with PromptPay QR generation, maintenance ticket tracking, parcel delivery notifications, amenity scheduling, and official administrative announcements.
 
@@ -242,14 +244,15 @@ The database bootstrapping command (`bootstrap_dormmate` and `bootstrap_oidc`) c
 
 ## 8. Application Screenshots
 
-| Resident Home Dashboard | Maintenance Requests & Timeline |
-|:---:|:---:|
-| ![Dashboard Preview](docs/screenshots/dashboard_preview.png) | ![Maintenance Preview](docs/screenshots/maintenance_preview.png) |
-| *Resident overview, room contract, utility cards, notices* | *Ticket submission, urgency badge, status progression* |
+| Resident Home | Expenses & Utility Bills | Maintenance Tracking |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/home_screen.png" width="280" alt="Resident Home Dashboard" /> | <img src="docs/screenshots/expenses_screen.png" width="280" alt="Expenses & Bills" /> | <img src="docs/screenshots/maintenance_screen.png" width="280" alt="Maintenance Requests" /> |
+| *Resident overview, contract info, quick actions* | *Itemized utilities, overdue bill alert, PromptPay* | *Maintenance tickets, urgency badges, status tabs* |
 
-### System UI Panorama
-![DormMate Overview](docs/screenshots/dormmate_overview.png)
-*Full application suite: Login, Resident Home, Expenses, Maintenance tracking, and Notices.*
+| Administrative Announcements | Resident Profile & Settings |
+|:---:|:---:|
+| <img src="docs/screenshots/announcements_screen.png" width="280" alt="Announcements" /> | <img src="docs/screenshots/profile_screen.png" width="280" alt="Resident Profile" /> |
+| *Official dorm updates, category filters, unread badges* | *Personal info, appearance presets, Dark Mode, i18n* |
 
 ---
 
