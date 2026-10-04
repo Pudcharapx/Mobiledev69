@@ -48,6 +48,7 @@ class Command(BaseCommand):
         ]
         client._scope = "openid profile email"
         client.require_consent = False
+        client.reuse_consent = True
         client.save()
         client.response_types.set(response_types)
 

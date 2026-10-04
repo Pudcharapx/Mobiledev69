@@ -27,11 +27,18 @@ class _CallbackScreenState extends State<CallbackScreen> {
   }
 
   Future<void> _processCallback() async {
+    final hasCode = Uri.base.queryParameters.containsKey('code') ||
+        Uri.base.fragment.contains('code=');
+    if (!hasCode) {
+      if (mounted) context.go('/login');
+      return;
+    }
+
     try {
       final authVm = context.read<AuthViewModel>();
       final success = await authVm.handleOidcCallback();
       if (success && mounted) {
-        context.go('/');
+        context.go('/home');
       } else if (mounted) {
         setState(() {
           _errorMessage = authVm.errorMessage ?? 'OIDC sign-in could not be completed.';

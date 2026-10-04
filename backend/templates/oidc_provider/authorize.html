@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Authorizing | DormMate</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body {
+      align-items: center;
+      background: radial-gradient(circle at 50% 30%, #1e1b4b 0%, #0f172a 100%);
+      display: flex;
+      justify-content: center;
+      margin: 0;
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+      max-width: 420px;
+      padding: 36px 32px;
+      text-align: center;
+      width: calc(100% - 32px);
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(99, 102, 241, 0.2);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    h1 { font-size: 22px; font-weight: 700; margin: 0 0 8px; color: #ffffff; }
+    p { color: #94a3b8; font-size: 14px; margin: 0 0 20px; line-height: 1.5; }
+    button {
+      background: #6366f1;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 10px 20px;
+      transition: background 0.2s;
+    }
+    button:hover { background: #4f46e5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>Authorizing DormMate</h1>
+    <p>Connecting your account, please wait a moment...</p>
+
+    <form id="consent-form" method="post" action="{% url 'oidc_provider:authorize' %}">
+      {% csrf_token %}
+      {{ hidden_inputs }}
+      <input type="hidden" name="allow" value="Authorize">
+      <noscript>
+        <button type="submit">Click to continue</button>
+      </noscript>
+    </form>
+  </div>
+
+  <script>
+    // Automatically submit to bypass the consent screen seamlessly
+    document.addEventListener("DOMContentLoaded", function() {
+      var form = document.getElementById("consent-form");
+      if (form) {
+        form.submit();
+      }
+    });
+  </script>
+</body>
+</html>

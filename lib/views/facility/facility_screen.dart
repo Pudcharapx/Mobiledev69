@@ -35,7 +35,7 @@ class _FacilityScreenState extends State<FacilityScreen> {
       Navigator.of(context).pop();
     } else {
       try {
-        context.go('/');
+        context.go('/home');
       } catch (_) {}
     }
   }

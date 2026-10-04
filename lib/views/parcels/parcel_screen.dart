@@ -41,7 +41,7 @@ class _ParcelScreenState extends State<ParcelScreen> {
       Navigator.of(context).pop();
     } else {
       try {
-        context.go('/');
+        context.go('/home');
       } catch (_) {}
     }
   }

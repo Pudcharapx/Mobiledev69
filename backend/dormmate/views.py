@@ -28,17 +28,17 @@ class AuthLoginView(APIView):
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
 
         client = Client.objects.filter(client_id='muscledev-frontend').first()
-        token, created = Token.objects.get_or_create(
-            user=user,
-            client=client,
-            defaults={
-                'access_token': uuid.uuid4().hex,
-                'refresh_token': uuid.uuid4().hex,
-                'expires_at': timezone.now() + timedelta(days=30),
-                '_scope': 'openid profile email'
-            }
-        )
-        if token.has_expired():
+        token = Token.objects.filter(user=user, client=client).order_by('-expires_at').first()
+        if not token:
+            token = Token.objects.create(
+                user=user,
+                client=client,
+                access_token=uuid.uuid4().hex,
+                refresh_token=uuid.uuid4().hex,
+                expires_at=timezone.now() + timedelta(days=30),
+                _scope='openid profile email'
+            )
+        elif token.has_expired():
             token.access_token = uuid.uuid4().hex
             token.expires_at = timezone.now() + timedelta(days=30)
             token.save()

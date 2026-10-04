@@ -22,11 +22,18 @@ class _CallbackScreenState extends State<CallbackScreen> {
   }
 
   Future<void> _processCallback() async {
+    final hasCode = Uri.base.queryParameters.containsKey('code') ||
+        Uri.base.fragment.contains('code=');
+    if (!hasCode) {
+      if (mounted) context.go('/login');
+      return;
+    }
+
     try {
       final authService = context.read<AuthService>();
       final session = await authService.handleCallback();
       if (session != null && mounted) {
-        context.go('/');
+        context.go('/home');
       } else if (mounted) {
         setState(() {
           _status = 'Authentication was not completed.';

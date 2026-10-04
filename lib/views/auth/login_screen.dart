@@ -15,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final _usernameController = TextEditingController(text: 'test');
   final _passwordController = TextEditingController(text: '1234');
   bool _obscurePassword = true;
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     final success = await authVm.login(username, password);
     if (success && mounted) {
-      context.go('/');
+      context.go('/home');
     }
   }
 

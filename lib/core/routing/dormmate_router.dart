@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../views/auth/login_screen.dart';
@@ -19,13 +20,32 @@ import '../../views/profile/resident_guide_screen.dart';
 
 GoRouter createDormMateRouter(AuthViewModel authViewModel) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/home',
     refreshListenable: authViewModel,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      final isLoggingIn = loc == '/login';
-      final isCallback = loc == '/callback' || loc == '/callback/' || state.uri.path.startsWith('/callback');
+      final uriPath = state.uri.path;
+      final isLoggingIn = loc == '/login' || uriPath == '/login';
+      final hasOidcCode = state.uri.queryParameters.containsKey('code') ||
+          (kIsWeb &&
+              (Uri.base.queryParameters.containsKey('code') ||
+                  Uri.base.fragment.contains('code=')));
+      final isWebCallback = kIsWeb && Uri.base.path.startsWith('/callback') && hasOidcCode;
+      final isCallback = (loc == '/callback' || loc == '/callback/' || uriPath.startsWith('/callback')) && hasOidcCode;
       final isAuth = authViewModel.isAuthenticated;
+
+      // In Flutter Web, if browser directly landed on /callback with an incoming OIDC code, route to /callback
+      if (isWebCallback && !loc.startsWith('/callback') && !isAuth) {
+        final query = Uri.base.hasQuery ? '?${Uri.base.query}' : '';
+        return '/callback$query';
+      }
+
+      // Normalize trailing slash if length > 1 (e.g. /home/ -> /home, /login/ -> /login)
+      if (uriPath.length > 1 && uriPath.endsWith('/')) {
+        final stripped = uriPath.substring(0, uriPath.length - 1);
+        final query = state.uri.hasQuery ? '?${state.uri.query}' : '';
+        return '$stripped$query';
+      }
 
       if (isCallback) {
         return null;
@@ -33,8 +53,11 @@ GoRouter createDormMateRouter(AuthViewModel authViewModel) {
       if (!isAuth && !isLoggingIn) {
         return '/login';
       }
-      if (isAuth && isLoggingIn) {
-        return '/';
+      if (isAuth && (isLoggingIn || loc == '/' || loc.isEmpty || uriPath == '/' || uriPath.isEmpty)) {
+        return '/home';
+      }
+      if (!isAuth && (loc == '/' || loc.isEmpty || uriPath == '/' || uriPath.isEmpty)) {
+        return '/login';
       }
       return null;
     },
@@ -68,7 +91,7 @@ GoRouter createDormMateRouter(AuthViewModel authViewModel) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/',
+                path: '/home',
                 builder: (context, state) => const HomeScreen(),
               ),
             ],

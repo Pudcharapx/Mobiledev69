@@ -257,7 +257,7 @@ The database bootstrapping command (`bootstrap_dormmate` and `bootstrap_oidc`) c
 
 - **Video URL:** `[YouTube link — Unlisted]` *(e.g. `https://youtu.be/your_unlisted_video_id`)*
 - **Duration:** 5–8 minutes
-- **Complete Storyboard & Script:** See [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) for word-for-word voiceover and screen actions.
+- **Complete Storyboard & Script:** See [docs/SPEAKING_SCRIPT.md](docs/SPEAKING_SCRIPT.md) for the word-for-word presenter script and [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) for technical presentation criteria.
 
 ### Video Presentation Timeline
 

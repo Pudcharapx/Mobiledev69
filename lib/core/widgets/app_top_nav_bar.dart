@@ -70,7 +70,7 @@ class AppTopNavBar extends StatelessWidget implements PreferredSizeWidget {
                   } else if (canPop) {
                     Navigator.of(context).pop();
                   } else {
-                    context.go('/');
+                    context.go('/home');
                   }
                 },
               )
