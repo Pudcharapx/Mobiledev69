@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 import '../models/expense.dart';
 import 'status_badge.dart';
 import 'app_animations.dart';
@@ -74,7 +75,7 @@ class ExpenseSummaryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  expense.displayMonth.toUpperCase(),
+                  expense.displayMonthLocale(context.isThai).toUpperCase(),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -95,7 +96,9 @@ class ExpenseSummaryCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                expense.dueDate != null ? 'Due ${expense.dueDate}' : 'Monthly expenses',
+                expense.dueDate != null
+                    ? (context.isThai ? 'ครบกำหนดชำระ ${expense.dueDate}' : 'Due ${expense.dueDate}')
+                    : context.tr('Monthly expenses', 'ค่าใช้จ่ายประจำเดือน'),
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.white.withValues(alpha: 0.8),

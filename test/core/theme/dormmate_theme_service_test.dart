@@ -49,24 +49,24 @@ void main() {
       service = DormMateThemeService(storage: storage);
     });
 
-    test('defaults to DormMateThemePreset.system before initialization', () {
-      expect(service.preset, equals(DormMateThemePreset.system));
-      expect(service.themeMode, equals(ThemeMode.system));
+    test('defaults to DormMateThemePreset.light before initialization', () {
+      expect(service.preset, equals(DormMateThemePreset.light));
+      expect(service.themeMode, equals(ThemeMode.light));
       expect(service.isDarkMode, isFalse);
     });
 
     test('setPreset updates preset and persists preference to storage', () async {
-      await service.setPreset(DormMateThemePreset.light);
-      expect(service.preset, equals(DormMateThemePreset.light));
-      expect(service.themeMode, equals(ThemeMode.light));
-      expect(service.isDarkMode, isFalse);
-      expect(storage.data[DormMateThemeService.keyPreset], equals('light'));
-
       await service.setPreset(DormMateThemePreset.dark);
       expect(service.preset, equals(DormMateThemePreset.dark));
       expect(service.themeMode, equals(ThemeMode.dark));
       expect(service.isDarkMode, isTrue);
       expect(storage.data[DormMateThemeService.keyPreset], equals('dark'));
+
+      await service.setPreset(DormMateThemePreset.light);
+      expect(service.preset, equals(DormMateThemePreset.light));
+      expect(service.themeMode, equals(ThemeMode.light));
+      expect(service.isDarkMode, isFalse);
+      expect(storage.data[DormMateThemeService.keyPreset], equals('light'));
     });
 
     test('toggleDarkMode toggles between dark and light presets', () async {

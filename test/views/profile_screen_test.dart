@@ -32,6 +32,10 @@ class FakeAuthRepo implements AuthRepository {
   @override
   Future<bool> login(String username, String password) async => true;
   @override
+  Future<void> startOidcLogin() async {}
+  @override
+  Future<bool> handleOidcCallback() async => true;
+  @override
   Future<void> logout() async {}
   @override
   Future<bool> isAuthenticated() async => true;
@@ -60,7 +64,9 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    // Pump through initial load + FadeSlideEntry delays (max delay 240ms + 450ms animation)
+    await tester.pump(const Duration(milliseconds: 800));
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Verify Profile Info
     expect(find.text('Profile'), findsOneWidget);
@@ -90,8 +96,12 @@ void main() {
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
+    // Scroll to ensure Appearance row is visible and hittable
+    await tester.scrollUntilVisible(find.text('Appearance'), 80.0);
+    await tester.pump(const Duration(milliseconds: 100));
+
     // Tap 'Appearance' row
-    await tester.tap(find.text('Appearance'));
+    await tester.tap(find.text('Appearance'), warnIfMissed: false);
     await tester.pumpAndSettle();
 
     // Verify Appearance sheet opens

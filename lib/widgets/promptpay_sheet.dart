@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 
 void showPromptPaySheet(
   BuildContext context, {
@@ -75,7 +76,7 @@ void showPromptPaySheet(
                 const SizedBox(height: 10),
 
                 Text(
-                  'Dormitory Management (หอพักนักศึกษา อาคาร B)',
+                  context.tr('Dormitory Management (Building B)', 'สำนักงานหอพักนักศึกษา (อาคาร B)'),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -102,9 +103,9 @@ void showPromptPaySheet(
                       onTap: () {
                         Clipboard.setData(const ClipboardData(text: '0891234567'));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('PromptPay ID copied to clipboard'),
-                            duration: Duration(seconds: 2),
+                          SnackBar(
+                            content: Text(context.tr('PromptPay ID copied to clipboard', 'คัดลอกรหัสพร้อมเพย์แล้ว')),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       },
@@ -135,7 +136,9 @@ void showPromptPaySheet(
                   child: Column(
                     children: [
                       Text(
-                        billingMonth.isNotEmpty ? 'Billing: $billingMonth' : billTitle,
+                        billingMonth.isNotEmpty
+                            ? '${context.tr('Billing', 'รอบบิล')}: $billingMonth'
+                            : context.tr(billTitle, 'ค่าใช้จ่ายหอพักประจำเดือน'),
                         style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary),
                       ),
                       const SizedBox(height: 2),
@@ -167,14 +170,14 @@ void showPromptPaySheet(
                         onPressed: () {
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('QR Code saved to photo album'),
-                              duration: Duration(seconds: 2),
+                            SnackBar(
+                              content: Text(context.tr('QR Code saved to photo album', 'บันทึกภาพ QR Code ลงในเครื่องแล้ว')),
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         },
                         icon: const Icon(Icons.download_rounded, size: 17),
-                        label: const Text('Save QR'),
+                        label: Text(context.tr('Save QR', 'บันทึกภาพ')),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -192,14 +195,14 @@ void showPromptPaySheet(
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Payment slip uploaded! Dorm staff will verify.'),
+                              content: Text(context.tr('Payment slip uploaded! Dorm staff will verify.', 'ส่งสลิปชำระเงินแล้ว! เจ้าหน้าที่จะตรวจสอบข้อมูล')),
                               backgroundColor: DormMateColors.statusCompleted,
                               duration: const Duration(seconds: 3),
                             ),
                           );
                         },
                         icon: const Icon(Icons.upload_file_rounded, size: 17),
-                        label: const Text('Attach Slip'),
+                        label: Text(context.tr('Attach Slip', 'แนบสลิป')),
                       ),
                     ),
                   ],

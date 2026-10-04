@@ -2,6 +2,8 @@ import '../services/auth_service.dart';
 
 abstract class AuthRepository {
   Future<bool> login(String username, String password);
+  Future<void> startOidcLogin() async {}
+  Future<bool> handleOidcCallback() async => false;
   Future<void> logout();
   Future<bool> isAuthenticated();
   Future<String?> getCurrentUserName();
@@ -16,6 +18,12 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<bool> login(String username, String password) =>
       _authService.login(username, password);
+
+  @override
+  Future<void> startOidcLogin() => _authService.startOidcLogin();
+
+  @override
+  Future<bool> handleOidcCallback() => _authService.handleOidcCallback();
 
   @override
   Future<void> logout() => _authService.logout();

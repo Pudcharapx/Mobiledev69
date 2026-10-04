@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 import '../models/parcel.dart';
 import 'status_badge.dart';
 import 'parcel_pickup_sheet.dart';
+import 'neumorphic.dart';
 
 class ParcelCard extends StatelessWidget {
   final Parcel parcel;
@@ -31,30 +33,15 @@ class ParcelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final carrierColor = _getCarrierColor(parcel.carrier);
 
-    return Container(
+    return NeuContainer(
+      isDark: isDark,
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.95),
-          width: 1.2,
-        ),
-        boxShadow: [
-          const BoxShadow(
-            color: Color(0x09000000),
-            blurRadius: 14,
-            offset: Offset(0, 4),
-          ),
-          BoxShadow(
-            color: carrierColor.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      borderRadius: 18,
+      shadowIntensity: 0.85,
+      padding: EdgeInsets.zero,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () => showParcelPickupSheet(context, parcel: parcel, onClaim: onClaim),
@@ -68,12 +55,12 @@ class ParcelCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    width: 42,
-                    height: 42,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          carrierColor.withValues(alpha: 0.18),
+                          carrierColor.withValues(alpha: 0.22),
                           carrierColor.withValues(alpha: 0.08),
                         ],
                         begin: Alignment.topLeft,
@@ -81,11 +68,11 @@ class ParcelCard extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: carrierColor.withValues(alpha: 0.25),
+                        color: carrierColor.withValues(alpha: 0.35),
                         width: 1,
                       ),
                     ),
-                    child: Icon(_getCarrierIcon(parcel.carrier), color: carrierColor, size: 20),
+                    child: Icon(_getCarrierIcon(parcel.carrier), color: carrierColor, size: 22),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -133,7 +120,7 @@ class ParcelCard extends StatelessWidget {
               // Middle Divider
               Container(
                 height: 1,
-                color: const Color(0x0D000000),
+                color: isDark ? const Color(0xFF28334E) : const Color(0xFFE2E8F0),
               ),
               const SizedBox(height: 10),
 
@@ -164,9 +151,9 @@ class ParcelCard extends StatelessWidget {
                           onTap: () {
                             Clipboard.setData(ClipboardData(text: parcel.trackingNumber));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Tracking number copied to clipboard'),
-                                duration: Duration(seconds: 1),
+                              SnackBar(
+                                content: Text(context.tr('Tracking number copied to clipboard', 'คัดลอกหมายเลขพัสดุแล้ว')),
+                                duration: const Duration(seconds: 1),
                               ),
                             );
                           },
@@ -182,10 +169,10 @@ class ParcelCard extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: parcel.isReady
                           ? DormMateColors.primary
-                          : (DormMateColors.isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
+                          : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                       foregroundColor: parcel.isReady
                           ? Colors.white
-                          : (DormMateColors.isDark ? Colors.white70 : const Color(0xFF64748B)),
+                          : (isDark ? Colors.white70 : const Color(0xFF64748B)),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -198,10 +185,10 @@ class ParcelCard extends StatelessWidget {
                       size: 14,
                       color: parcel.isReady
                           ? Colors.white
-                          : (DormMateColors.isDark ? Colors.white70 : const Color(0xFF64748B)),
+                          : (isDark ? Colors.white70 : const Color(0xFF64748B)),
                     ),
                     label: Text(
-                      parcel.isReady ? 'Pickup QR' : 'Details',
+                      parcel.isReady ? context.tr('Pickup QR', 'คิวอาร์รับของ') : context.tr('Details', 'รายละเอียด'),
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                     ),
                   ),

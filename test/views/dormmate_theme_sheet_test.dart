@@ -34,6 +34,10 @@ class FakeAuthRepo implements AuthRepository {
   @override
   Future<bool> login(String username, String password) async => true;
   @override
+  Future<void> startOidcLogin() async {}
+  @override
+  Future<bool> handleOidcCallback() async => true;
+  @override
   Future<void> logout() async {}
   @override
   Future<bool> isAuthenticated() async => true;

@@ -10,7 +10,7 @@ class DormMateThemeService extends ChangeNotifier {
   static const String keyPreset = 'dormmate_theme_preset';
 
   final FlutterSecureStorage _storage;
-  DormMateThemePreset _preset = DormMateThemePreset.system;
+  DormMateThemePreset _preset = DormMateThemePreset.light;
   bool _isInitialized = false;
 
   DormMateThemeService({FlutterSecureStorage? storage})
@@ -58,9 +58,11 @@ class DormMateThemeService extends ChangeNotifier {
       final savedPreset = await _storage.read(key: keyPreset);
       if (savedPreset != null) {
         _preset = _parsePreset(savedPreset);
+      } else {
+        _preset = DormMateThemePreset.light;
       }
     } catch (_) {
-      _preset = DormMateThemePreset.system;
+      _preset = DormMateThemePreset.light;
     } finally {
       _isInitialized = true;
       DormMateColors.isDark = isDarkMode;
@@ -98,6 +100,6 @@ class DormMateThemeService extends ChangeNotifier {
         return p;
       }
     }
-    return DormMateThemePreset.system;
+    return DormMateThemePreset.light;
   }
 }

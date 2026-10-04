@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/dormmate_constants.dart';
 import '../../core/theme/dormmate_theme_presets.dart';
 import '../../core/theme/dormmate_theme_service.dart';
+import '../../core/localization/language_service.dart';
 import '../../viewmodels/profile_viewmodel.dart';
 import '../../viewmodels/auth_viewmodel.dart';
-import '../../widgets/glass_card.dart';
 import '../../widgets/state_views.dart';
 import '../../widgets/app_animations.dart';
+import '../../widgets/neumorphic.dart';
+import '../../widgets/language_toggle_button.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -88,11 +90,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 20),
                 Divider(height: 1, color: DormMateColors.divider),
                 const SizedBox(height: 12),
-                _buildInfoRow('Student / Resident ID', 'STD-6510204'),
-                _buildInfoRow('Room Number', 'Room $roomDisplay (Building B)'),
-                _buildInfoRow('Contact Phone', '081-234-5678'),
-                _buildInfoRow('Emergency Contact', '089-876-5432 (Parent)'),
-                _buildInfoRow('Lease Term', 'Aug 2026 - May 2027 (Active)'),
+                _buildInfoRow(context.tr('Student / Resident ID', 'รหัสนักศึกษา / ผู้พัก'), 'STD-6510204'),
+                _buildInfoRow(context.tr('Room Number', 'หมายเลขห้องพัก'), '${context.tr('Room', 'ห้อง')} $roomDisplay (${context.tr('Building B', 'อาคาร B')})'),
+                _buildInfoRow(context.tr('Contact Phone', 'เบอร์ติดต่อ'), '081-234-5678'),
+                _buildInfoRow(context.tr('Emergency Contact', 'ผู้ติดต่อฉุกเฉิน'), '089-876-5432 (${context.tr('Parent', 'ผู้ปกครอง')})'),
+                _buildInfoRow(context.tr('Lease Term', 'ระยะเวลาสัญญาเช่า'), 'Aug 2026 - May 2027 (${context.tr('Active', 'ใช้งานอยู่')})'),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -102,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () => Navigator.pop(ctx),
-                    child: const Text('Close'),
+                    child: Text(context.tr('Close', 'ปิด')),
                   ),
                 ),
               ],
@@ -143,17 +145,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Room Information',
+                  context.tr('Room Information', 'ข้อมูลห้องพัก'),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: DormMateColors.textPrimary),
                 ),
                 const SizedBox(height: 4),
-                Text('Room $roomDisplay · Building B · Floor 2', style: TextStyle(fontSize: 13, color: DormMateColors.textSecondary)),
+                Text(
+                  context.isThai ? 'ห้อง $roomDisplay · อาคาร B · ชั้น 2' : 'Room $roomDisplay · Building B · Floor 2',
+                  style: TextStyle(fontSize: 13, color: DormMateColors.textSecondary),
+                ),
                 const SizedBox(height: 18),
-                _buildInfoRow('Room Type', 'Twin Room (2 Residents)'),
-                _buildInfoRow('Bed Assignment', 'Bed 01 (Left Side)'),
-                _buildInfoRow('Wi-Fi Network', 'DormMate_B204'),
-                _buildInfoRow('Wi-Fi Password', 'dormmate2026'),
-                _buildInfoRow('Keycard Number', 'KC-990234-B'),
+                _buildInfoRow(context.tr('Room Type', 'ประเภทห้อง'), context.tr('Twin Room (2 Residents)', 'ห้องเตียงคู่ (2 คน)')),
+                _buildInfoRow(context.tr('Bed Assignment', 'ตำแหน่งเตียง'), context.tr('Bed 01 (Left Side)', 'เตียง 01 (ฝั่งซ้าย)')),
+                _buildInfoRow(context.tr('Wi-Fi Network', 'ชื่อเครือข่าย Wi-Fi'), 'DormMate_B204'),
+                _buildInfoRow(context.tr('Wi-Fi Password', 'รหัสผ่าน Wi-Fi'), 'dormmate2026'),
+                _buildInfoRow(context.tr('Keycard Number', 'หมายเลขคีย์การ์ด'), 'KC-990234-B'),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -168,11 +173,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Clipboard.setData(const ClipboardData(text: 'dormmate2026'));
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Wi-Fi password copied to clipboard!')),
+                        SnackBar(content: Text(context.tr('Wi-Fi password copied to clipboard!', 'คัดลอกรหัสผ่าน Wi-Fi แล้ว!'))),
                       );
                     },
                     icon: const Icon(Icons.wifi_rounded, size: 18),
-                    label: const Text('Copy Wi-Fi Password'),
+                    label: Text(context.tr('Copy Wi-Fi Password', 'คัดลอกรหัส Wi-Fi')),
                   ),
                 ),
               ],
@@ -214,16 +219,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Notification Preferences',
+                    context.tr('Notification Preferences', 'ตั้งค่าการแจ้งเตือน'),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: DormMateColors.textPrimary),
                   ),
                   const SizedBox(height: 4),
-                  Text('Choose which dormitory alerts you wish to receive', style: TextStyle(fontSize: 12, color: DormMateColors.textSecondary)),
+                  Text(
+                    context.tr('Choose which dormitory alerts you wish to receive', 'เลือกรายการแจ้งเตือนหอพักที่คุณต้องการรับ'),
+                    style: TextStyle(fontSize: 12, color: DormMateColors.textSecondary),
+                  ),
                   const SizedBox(height: 16),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Bill Due Date Reminders', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary)),
-                    subtitle: Text('Alert when monthly bills are published or overdue', style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary)),
+                    title: Text(
+                      context.tr('Bill Due Date Reminders', 'แจ้งเตือนกำหนดชำระบิล'),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      context.tr('Alert when monthly bills are published or overdue', 'แจ้งเตือนเมื่อออกบิลใหม่หรือใกล้ครบกำหนด'),
+                      style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary),
+                    ),
                     value: _notifyBills,
                     activeTrackColor: DormMateColors.primary,
                     onChanged: (val) {
@@ -234,8 +248,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Divider(height: 1, color: DormMateColors.divider),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Maintenance Status Updates', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary)),
-                    subtitle: Text('Notify when technician is assigned or job completed', style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary)),
+                    title: Text(
+                      context.tr('Maintenance Status Updates', 'อัปเดตสถานะแจ้งซ่อม'),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      context.tr('Notify when technician is assigned or job completed', 'แจ้งเตือนเมื่อมอบหมายช่างหรือซ่อมเสร็จสิ้น'),
+                      style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary),
+                    ),
                     value: _notifyMaintenance,
                     activeTrackColor: DormMateColors.primary,
                     onChanged: (val) {
@@ -246,8 +266,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Divider(height: 1, color: DormMateColors.divider),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Urgent Announcements', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary)),
-                    subtitle: Text('Water/power shut-off, inspections, fire safety', style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary)),
+                    title: Text(
+                      context.tr('Urgent Announcements', 'ประกาศด่วนจากหอพัก'),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      context.tr('Water/power shut-off, inspections, fire safety', 'แจ้งตัดน้ำ/ไฟ, ตรวจห้อง, ซ้อมหนีไฟ'),
+                      style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary),
+                    ),
                     value: _notifyNotices,
                     activeTrackColor: DormMateColors.primary,
                     onChanged: (val) {
@@ -258,8 +284,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Divider(height: 1, color: DormMateColors.divider),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text('In-App Haptics & Sound', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary)),
-                    subtitle: Text('Vibration feedback on tap and submit', style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary)),
+                    title: Text(
+                      context.tr('In-App Haptics & Sound', 'ระบบสั่นและเสียงในแอป'),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: DormMateColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      context.tr('Vibration feedback on tap and submit', 'สั่นตอบสนองเมื่อกดปุ่มหรือส่งคำขอ'),
+                      style: TextStyle(fontSize: 11, color: DormMateColors.textSecondary),
+                    ),
                     value: _notifySound,
                     activeTrackColor: DormMateColors.primary,
                     onChanged: (val) {
@@ -280,10 +312,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () {
                         Navigator.pop(ctx);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Notification preferences saved')),
+                          SnackBar(content: Text(context.tr('Notification preferences saved', 'บันทึกการตั้งค่าการแจ้งเตือนแล้ว'))),
                         );
                       },
-                      child: const Text('Done'),
+                      child: Text(context.tr('Done', 'เสร็จสิ้น')),
                     ),
                   ),
                 ],
@@ -334,7 +366,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Appearance & Theme',
+                        context.tr('Appearance & Theme', 'ธีมและรูปลักษณ์'),
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: DormMateColors.textPrimary),
                       ),
                       if (themeService != null)
@@ -356,10 +388,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text('Customize the visual appearance of DormMate', style: TextStyle(fontSize: 12, color: DormMateColors.textSecondary)),
+                  Text(
+                    context.tr('Customize the visual appearance of DormMate', 'ปรับแต่งรูปแบบการแสดงผลของแอป DormMate'),
+                    style: TextStyle(fontSize: 12, color: DormMateColors.textSecondary),
+                  ),
                   const SizedBox(height: 16),
                   _buildThemeOption(
-                    title: 'Light Glassmorphic',
+                    title: context.tr('Light Glassmorphic', 'โหมดสว่าง Glassmorphic'),
                     subtitle: 'โหมดสว่าง (Light Mode) · ขาวสะอาดตา สไตล์ Frosted Glass',
                     ctx: ctx,
                     setSheetState: setSheetState,
@@ -367,7 +402,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     swatchColors: const [Color(0xFF5856D6), Color(0xFF38BDF8), Color(0xFFF1F5F9)],
                   ),
                   _buildThemeOption(
-                    title: 'Dark Mode',
+                    title: context.tr('Dark Mode', 'โหมดมืด (Dark Mode)'),
                     subtitle: 'โหมดมืด (Dark Mode) · ดำสนิท OLED ถนอมสายตายามค่ำคืน',
                     ctx: ctx,
                     setSheetState: setSheetState,
@@ -375,7 +410,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     swatchColors: const [Color(0xFF818CF8), Color(0xFF06B6D4), Color(0xFF0B0F19)],
                   ),
                   _buildThemeOption(
-                    title: 'System Follow',
+                    title: context.tr('System Follow', 'ตามระบบของเครื่อง'),
                     subtitle: 'ตามระบบเครื่อง (System) · สลับสว่าง/มืดตามการตั้งค่าของอุปกรณ์',
                     ctx: ctx,
                     setSheetState: setSheetState,
@@ -419,7 +454,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setSheetState(() {});
         Navigator.pop(ctx);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Theme set to: $title')),
+          SnackBar(content: Text(context.tr('Theme set to: $title', 'เปลี่ยนธีมเป็น: $title'))),
         );
       },
       child: Padding(
@@ -525,17 +560,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DormMateDimens.radiusLg),
         ),
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out of DormMate?'),
+        title: Text(context.tr('Sign Out', 'ออกจากระบบ')),
+        content: Text(context.tr('Are you sure you want to sign out of DormMate?', 'คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ DormMate?')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(context.tr('Cancel', 'ยกเลิก')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'Sign Out',
+              context.tr('Sign Out', 'ออกจากระบบ'),
               style: TextStyle(color: DormMateColors.statusErrorText),
             ),
           ),
@@ -559,88 +594,155 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final email = user?.email ?? authVm.currentUserEmail ?? 'resident@dormmate.ac.th';
     final roomDisplay = user?.room?.displayLabel ?? 'B-204';
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final langService = context.watch<LanguageService?>();
+    final isThai = langService?.isThai ?? false;
+
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text('Profile', style: DormMateTextStyles.title),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          isThai ? 'โปรไฟล์' : 'Profile',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: DormMateColors.textPrimary,
+            letterSpacing: -0.8,
+          ),
+        ),
+        actions: [
+          LanguageToggleButton(isDark: isDark),
+          const SizedBox(width: 16),
+        ],
       ),
-      body: vm.isLoading && user == null
+      body: AnimatedOrbBackground(
+        isDark: isDark,
+        orbColors: const [Color(0xFF667EEA), Color(0xFF764BA2), Color(0xFF43CFCF)],
+        child: vm.isLoading && user == null
           ? const LoadingView(message: 'Loading profile...')
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile hero
+                  // ── Profile hero ──────────────────────────────────────────
                   FadeSlideEntry(
                     delay: const Duration(milliseconds: 50),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(22),
                       margin: const EdgeInsets.only(bottom: 18),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF1C1C1E), Color(0xFF2D2D35)],
+                          colors: [Color(0xFF1A1F35), Color(0xFF0F1525), Color(0xFF1E1040)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(DormMateDimens.radiusXl),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF667EEA).withValues(alpha: 0.22),
+                            blurRadius: 28,
+                            offset: const Offset(0, 10),
+                            spreadRadius: -4,
+                          ),
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6),
+                            spreadRadius: -4,
+                          ),
+                        ],
                       ),
-                      child: Row(
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
                         children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: DormMateColors.primary,
-                            child: Text(
-                              displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          // ambient glow
+                          Positioned(
+                            top: -30,
+                            right: -30,
+                            child: Container(
+                              width: 140,
+                              height: 140,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(colors: [
+                                  const Color(0xFF764BA2).withValues(alpha: 0.30),
+                                  Colors.transparent,
+                                ]),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Padding(
+                            padding: const EdgeInsets.all(22),
+                            child: Row(
                               children: [
-                                Text(
-                                  displayName,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                // Avatar with gradient ring
+                                NeuContainer(
+                                  isDark: true,
+                                  borderRadius: 50,
+                                  shadowIntensity: 1.5,
+                                  padding: const EdgeInsets.all(4),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: NeuColors.primaryGradient,
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                    ),
+                                    child: vm.isLoading ?
+                                      const CircularProgressIndicator(color: Colors.white, strokeWidth: 2) :
+                                      CircleAvatar(
+                                        radius: 36,
+                                        backgroundColor: const Color(0xFF1A1F35),
+                                        child: Text(
+                                          displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  email,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0x335856D6),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: const Color(0x665856D6),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Room $roomDisplay',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFFA29BFE),
-                                    ),
+                                const SizedBox(width: 18),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        displayName,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white,
+                                          letterSpacing: -0.3,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        email,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white.withValues(alpha: 0.55),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          _buildMiniStat('Room', roomDisplay),
+                                          const SizedBox(width: 8),
+                                          _buildMiniStat('Floor', user?.room?.floor.toString() ?? '2'),
+                                          const SizedBox(width: 8),
+                                          _buildMiniStat('Bldg', user?.room?.building ?? 'B'),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -657,24 +759,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('ROOM INFORMATION', style: DormMateTextStyles.label),
+                        Row(
+                          children: [
+                            Container(
+                              width: 3,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(1.5),
+                                gradient: const LinearGradient(
+                                  colors: NeuColors.primaryGradient,
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(context.tr('ROOM INFORMATION', 'ข้อมูลห้องพัก'), style: DormMateTextStyles.label),
+                          ],
+                        ),
                         const SizedBox(height: 8),
-                        GlassCard(
+                        NeuContainer(
+                          isDark: isDark,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          borderRadius: 20,
+                          shadowIntensity: 0.85,
                           child: Column(
                             children: [
                               _buildSettingRow(
                                 icon: Icons.apartment_rounded,
-                                title: 'Building',
-                                subtitle: user?.room?.building != null ? 'Building ${user?.room?.building}' : 'Building B',
+                                title: context.tr('Building', 'อาคาร'),
+                                subtitle: user?.room?.building != null ? '${context.tr('Building', 'อาคาร')} ${user?.room?.building}' : context.tr('Building B', 'อาคาร B'),
                                 onTap: () => _showRoomDetailsSheet(roomDisplay),
+                                isDark: isDark,
                               ),
-                              Divider(height: 1, color: DormMateColors.divider),
+                              GradientDivider(isDark: isDark),
                               _buildSettingRow(
                                 icon: Icons.meeting_room_outlined,
-                                title: 'Room Number',
-                                subtitle: user?.room?.roomNumber != null ? '${user?.room?.roomNumber} · Floor ${user?.room?.floor}' : 'B-204 · 2nd Floor',
+                                title: context.tr('Room Number', 'เลขห้องพัก'),
+                                subtitle: user?.room?.roomNumber != null ? '${user?.room?.roomNumber} · ${context.tr('Floor', 'ชั้น')} ${user?.room?.floor}' : 'B-204 · 2nd Floor',
                                 onTap: () => _showRoomDetailsSheet(roomDisplay),
+                                isDark: isDark,
                               ),
                             ],
                           ),
@@ -691,29 +815,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('ACCOUNT & PREFERENCES', style: DormMateTextStyles.label),
+                        Text(context.tr('ACCOUNT & PREFERENCES', 'บัญชีและการตั้งค่า'), style: DormMateTextStyles.label),
                         const SizedBox(height: 8),
-                        GlassCard(
+                        NeuContainer(
+                          isDark: isDark,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          borderRadius: 20,
+                          shadowIntensity: 0.85,
                           child: Column(
                             children: [
                               _buildSettingRow(
                                 icon: Icons.person_outline_rounded,
-                                title: 'Personal Info',
-                                subtitle: 'View resident & lease details',
+                                title: context.tr('Personal Info', 'ข้อมูลส่วนตัว'),
+                                subtitle: context.tr('View resident & lease details', 'ดูรายละเอียดผู้พักและสัญญาเช่า'),
                                 onTap: () => _showPersonalInfoSheet(displayName, email, roomDisplay),
+                                isDark: isDark,
                               ),
-                              Divider(height: 1, color: DormMateColors.divider),
+                              GradientDivider(isDark: isDark),
                               _buildSettingRow(
                                 icon: Icons.notifications_none_rounded,
-                                title: 'Notifications',
-                                subtitle: 'Bill due, repair & notice alerts',
+                                title: context.tr('Notifications', 'การแจ้งเตือน'),
+                                subtitle: context.tr('Bill due, repair & notice alerts', 'แจ้งเตือนบิล, งานซ่อม และประกาศ'),
                                 onTap: _showNotificationsSheet,
+                                isDark: isDark,
                               ),
-                              Divider(height: 1, color: DormMateColors.divider),
+                              GradientDivider(isDark: isDark),
                               _buildSettingRow(
                                 icon: Icons.palette_outlined,
-                                title: 'Appearance',
+                                title: context.tr('Appearance', 'รูปแบบหน้าตาแอป'),
                                 subtitle: () {
                                   try {
                                     final s = context.watch<DormMateThemeService>();
@@ -723,8 +852,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   }
                                 }(),
                                 onTap: _showAppearanceSheet,
+                                isDark: isDark,
                               ),
-                              Divider(height: 1, color: DormMateColors.divider),
+                              GradientDivider(isDark: isDark),
                               Builder(
                                 builder: (context) {
                                   DormMateThemeService? themeService;
@@ -733,9 +863,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   } catch (_) {}
                                   return _buildSwitchRow(
                                     icon: Icons.dark_mode_outlined,
-                                    title: 'Dark Mode (โหมดมืด)',
-                                    subtitle: 'OLED Black ถนอมสายตายามค่ำคืน',
+                                    title: context.tr('Dark Mode (โหมดมืด)', 'โหมดมืด (Dark Mode)'),
+                                    subtitle: context.tr('OLED Black night mode', 'ถนอมสายตายามค่ำคืน'),
                                     value: themeService?.isDarkMode ?? false,
+                                    isDark: isDark,
                                     onChanged: (val) {
                                       if (themeService != null) {
                                         themeService.toggleDarkMode(val);
@@ -744,12 +875,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 },
                               ),
-                              Divider(height: 1, color: DormMateColors.divider),
+                              GradientDivider(isDark: isDark),
+                              _buildSettingRow(
+                                icon: Icons.translate_rounded,
+                                title: isThai ? 'ภาษา (Language)' : 'Language',
+                                subtitle: isThai ? 'ภาษาไทย · Thai' : 'English · ภาษาอังกฤษ',
+                                trailing: LanguageToggleButton(isDark: isDark),
+                                onTap: () => showLanguageSelectionSheet(context),
+                                isDark: isDark,
+                              ),
+                              GradientDivider(isDark: isDark),
                               _buildSettingRow(
                                 icon: Icons.menu_book_rounded,
-                                title: 'Resident Handbook & Guides',
-                                subtitle: 'คู่มือและขั้นตอนการใช้งานหอพัก',
+                                title: context.tr('Resident Handbook & Guides', 'คู่มือและระเบียบหอพัก'),
+                                subtitle: context.tr('Dormitory handbook & procedures', 'คู่มือและขั้นตอนการใช้งานหอพัก'),
                                 onTap: () => context.push('/resident-guide'),
+                                isDark: isDark,
                               ),
                             ],
                           ),
@@ -760,29 +901,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Logout button
+                  // ── Logout button ─────────────────────────────────────────
                   FadeSlideEntry(
                     delay: const Duration(milliseconds: 240),
-                    child: PressableScale(
-                      onTap: _handleLogout,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        decoration: BoxDecoration(
-                          color: DormMateColors.statusErrorBg,
-                          borderRadius: BorderRadius.circular(DormMateDimens.radiusMd),
-                        ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: NeuButton(
+                        isDark: isDark,
+                        gradientColors: const [Color(0xFFEF4444), Color(0xFFDC2626)],
+                        borderRadius: 16,
+                        onTap: _handleLogout,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.logout_rounded, color: DormMateColors.statusErrorText, size: 18),
+                            const Icon(Icons.logout_rounded, color: Colors.white, size: 18),
                             const SizedBox(width: 8),
                             Text(
-                              'Sign Out',
-                              style: TextStyle(
-                                color: DormMateColors.statusErrorText,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                              context.tr('Sign Out', 'ออกจากระบบ'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
                               ),
                             ),
                           ],
@@ -802,6 +941,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+        ),
+    );
+  }
+
+  Widget _buildMiniStat(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A2035).withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF667EEA).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Text(label, style: const TextStyle(fontSize: 9, color: Colors.white54)),
+          const SizedBox(height: 2),
+          Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+        ],
+      ),
     );
   }
 
@@ -809,6 +967,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required IconData icon,
     required String title,
     required String subtitle,
+    required bool isDark,
+    Widget? trailing,
     VoidCallback? onTap,
   }) {
     return InkWell(
@@ -818,14 +978,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
         child: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: DormMateColors.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, size: 16, color: DormMateColors.primary),
+            NeuIconBox(
+              icon: icon,
+              iconColor: DormMateColors.primary,
+              isDark: isDark,
+              size: 36,
+              iconSize: 18,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -850,11 +1008,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: DormMateColors.textDisabled,
-              size: 18,
-            ),
+            trailing ??
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: DormMateColors.textDisabled,
+                  size: 18,
+                ),
           ],
         ),
       ),
@@ -866,20 +1025,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String title,
     required String subtitle,
     required bool value,
+    required bool isDark,
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: DormMateColors.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, size: 16, color: DormMateColors.primary),
+          NeuIconBox(
+            icon: icon,
+            iconColor: DormMateColors.primary,
+            isDark: isDark,
+            size: 36,
+            iconSize: 18,
           ),
           const SizedBox(width: 14),
           Expanded(

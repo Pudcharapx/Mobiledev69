@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 import '../models/utility_usage.dart';
+import 'neumorphic.dart';
 
 class UtilityAnalyticsCard extends StatefulWidget {
   final UtilityAnalyticsData? data;
@@ -15,8 +17,28 @@ class UtilityAnalyticsCard extends StatefulWidget {
 class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
   bool _isElectricity = true; // true = Electricity, false = Water
 
+  String _getMonthLabel(String label, BuildContext context) {
+    if (!context.isThai) return label;
+    switch (label.toLowerCase()) {
+      case 'jan': return 'ม.ค.';
+      case 'feb': return 'ก.พ.';
+      case 'mar': return 'มี.ค.';
+      case 'apr': return 'เม.ย.';
+      case 'may': return 'พ.ค.';
+      case 'jun': return 'มิ.ย.';
+      case 'jul': return 'ก.ค.';
+      case 'aug': return 'ส.ค.';
+      case 'sep': return 'ก.ย.';
+      case 'oct': return 'ต.ค.';
+      case 'nov': return 'พ.ย.';
+      case 'dec': return 'ธ.ค.';
+      default: return label;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final analytics = widget.data ?? UtilityAnalyticsData.mockDefault();
     final records = analytics.historicalRecords;
 
@@ -40,23 +62,11 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
       (max, r) => math.max(max, isElec ? r.electricityUnits : r.waterUnits),
     );
 
-    return Container(
+    return NeuContainer(
+      isDark: isDark,
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.95),
-          width: 1.2,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x09000000),
-            blurRadius: 16,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
+      borderRadius: 22,
+      shadowIntensity: 0.85,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -69,19 +79,17 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                   Icon(Icons.bar_chart_rounded, size: 20, color: DormMateColors.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'Usage Analytics',
+                    context.tr('Usage Analytics', 'วิเคราะห์การใช้พลังงาน'),
                     style: DormMateTextStyles.sectionTitle,
                   ),
                 ],
               ),
               // Segmented Toggle Pill
-              Container(
+              NeuContainer(
+                isDark: isDark,
+                isInset: true,
                 padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: DormMateColors.isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: DormMateColors.divider),
-                ),
+                borderRadius: 20,
                 child: Row(
                   children: [
                     GestureDetector(
@@ -89,14 +97,16 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: isElec
-                              ? (DormMateColors.isDark ? const Color(0xFF1E293B) : Colors.white)
-                              : Colors.transparent,
+                          gradient: isElec
+                              ? const LinearGradient(
+                                  colors: [Color(0xFFFF9500), Color(0xFFFFB300)],
+                                )
+                              : null,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: isElec
                               ? const [
                                   BoxShadow(
-                                    color: Color(0x14000000),
+                                    color: Color(0x24000000),
                                     blurRadius: 6,
                                     offset: Offset(0, 2),
                                   ),
@@ -108,15 +118,15 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                             Icon(
                               Icons.bolt_rounded,
                               size: 14,
-                              color: isElec ? const Color(0xFFFF9500) : DormMateColors.textTertiary,
+                              color: isElec ? Colors.white : DormMateColors.textTertiary,
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Power',
+                              context.tr('Power', 'ไฟฟ้า'),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: isElec ? FontWeight.w700 : FontWeight.w500,
-                                color: isElec ? DormMateColors.textPrimary : DormMateColors.textSecondary,
+                                color: isElec ? Colors.white : DormMateColors.textSecondary,
                               ),
                             ),
                           ],
@@ -128,14 +138,16 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: !isElec
-                              ? (DormMateColors.isDark ? const Color(0xFF1E293B) : Colors.white)
-                              : Colors.transparent,
+                          gradient: !isElec
+                              ? const LinearGradient(
+                                  colors: [Color(0xFF007AFF), Color(0xFF5AC8FA)],
+                                )
+                              : null,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: !isElec
                               ? const [
                                   BoxShadow(
-                                    color: Color(0x14000000),
+                                    color: Color(0x24000000),
                                     blurRadius: 6,
                                     offset: Offset(0, 2),
                                   ),
@@ -147,15 +159,15 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                             Icon(
                               Icons.water_drop_rounded,
                               size: 14,
-                              color: !isElec ? const Color(0xFF007AFF) : DormMateColors.textTertiary,
+                              color: !isElec ? Colors.white : DormMateColors.textTertiary,
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Water',
+                              context.tr('Water', 'น้ำประปา'),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: !isElec ? FontWeight.w700 : FontWeight.w500,
-                                color: !isElec ? DormMateColors.textPrimary : DormMateColors.textSecondary,
+                                color: !isElec ? Colors.white : DormMateColors.textSecondary,
                               ),
                             ),
                           ],
@@ -167,7 +179,7 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           // Current Value & Comparison Metric
           Row(
@@ -202,8 +214,8 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: deltaPercent > 0
-                      ? (DormMateColors.isDark ? const Color(0x33E11D48) : const Color(0xFFFFEBE8))
-                      : (DormMateColors.isDark ? const Color(0x3310B981) : const Color(0xFFE8F8EE)),
+                      ? (isDark ? const Color(0x33E11D48) : const Color(0xFFFFEBE8))
+                      : (isDark ? const Color(0x3310B981) : const Color(0xFFE8F8EE)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -213,18 +225,21 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                       deltaPercent > 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
                       size: 12,
                       color: deltaPercent > 0
-                          ? (DormMateColors.isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48))
-                          : (DormMateColors.isDark ? const Color(0xFF34D399) : const Color(0xFF10B981)),
+                          ? (isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48))
+                          : (isDark ? const Color(0xFF34D399) : const Color(0xFF10B981)),
                     ),
                     const SizedBox(width: 2),
                     Text(
-                      '${deltaPercent.abs().toStringAsFixed(1)}% vs prev',
+                      context.tr(
+                        '${deltaPercent.abs().toStringAsFixed(1)}% vs prev',
+                        '${deltaPercent.abs().toStringAsFixed(1)}% เทียบก่อนหน้า',
+                      ),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: deltaPercent > 0
-                            ? (DormMateColors.isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48))
-                            : (DormMateColors.isDark ? const Color(0xFF34D399) : const Color(0xFF10B981)),
+                            ? (isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48))
+                            : (isDark ? const Color(0xFF34D399) : const Color(0xFF10B981)),
                       ),
                     ),
                   ],
@@ -234,7 +249,10 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
-                  'Avg: ${averageVal.toStringAsFixed(1)} $unitLabel',
+                  context.tr(
+                    'Avg: ${averageVal.toStringAsFixed(1)} $unitLabel',
+                    'เฉลี่ย: ${averageVal.toStringAsFixed(1)} $unitLabel',
+                  ),
                   style: TextStyle(
                     fontSize: 11,
                     color: DormMateColors.textTertiary,
@@ -290,7 +308,7 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                                 : null,
                             color: isLast
                                 ? null
-                                : (DormMateColors.isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                                : (isDark ? const Color(0xFF334155) : const Color(0xFFDCE2EE)),
                             borderRadius: BorderRadius.circular(6),
                             boxShadow: isLast
                                 ? [
@@ -306,7 +324,7 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
                         const SizedBox(height: 6),
                         // Month label
                         Text(
-                          record.monthLabel,
+                          _getMonthLabel(record.monthLabel, context),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: isLast ? FontWeight.w800 : FontWeight.w500,
@@ -320,16 +338,14 @@ class _UtilityAnalyticsCardState extends State<UtilityAnalyticsCard> {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           // Energy Insight Box
-          Container(
+          NeuContainer(
+            isDark: isDark,
+            isInset: true,
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: DormMateColors.isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: DormMateColors.divider),
-            ),
+            borderRadius: 14,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

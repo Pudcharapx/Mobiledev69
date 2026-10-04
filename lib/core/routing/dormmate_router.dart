@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../views/auth/login_screen.dart';
+import '../../views/auth/callback_screen.dart';
 import '../../views/main_navigation_shell.dart';
 import '../../views/home/home_screen.dart';
 import '../../views/expenses/expense_screen.dart';
@@ -21,9 +22,14 @@ GoRouter createDormMateRouter(AuthViewModel authViewModel) {
     initialLocation: '/',
     refreshListenable: authViewModel,
     redirect: (context, state) {
-      final isLoggingIn = state.matchedLocation == '/login';
+      final loc = state.matchedLocation;
+      final isLoggingIn = loc == '/login';
+      final isCallback = loc == '/callback' || loc == '/callback/' || state.uri.path.startsWith('/callback');
       final isAuth = authViewModel.isAuthenticated;
 
+      if (isCallback) {
+        return null;
+      }
       if (!isAuth && !isLoggingIn) {
         return '/login';
       }
@@ -36,6 +42,10 @@ GoRouter createDormMateRouter(AuthViewModel authViewModel) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/callback',
+        builder: (context, state) => const CallbackScreen(),
       ),
       GoRoute(
         path: '/parcels',

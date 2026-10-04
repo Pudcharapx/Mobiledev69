@@ -123,12 +123,17 @@ class MaintenanceViewModel extends ChangeNotifier {
   }
 
   Future<bool> cancelRequest(int id) async {
+    final index = _requests.indexWhere((r) => r.id == id);
+    if (index == -1) return false;
+    final removed = _requests.removeAt(index);
+    notifyListeners();
+
     try {
       await _repository.cancelRequest(id);
-      _requests.removeWhere((r) => r.id == id);
-      notifyListeners();
       return true;
     } catch (e) {
+      // Revert upon failure
+      _requests.insert(index, removed);
       _errorMessage = 'Failed to cancel request.';
       notifyListeners();
       return false;

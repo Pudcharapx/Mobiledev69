@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 import '../models/parcel.dart';
 import 'promptpay_sheet.dart';
 
@@ -67,7 +68,7 @@ void showParcelPickupSheet(
                 const SizedBox(height: 10),
 
                 Text(
-                  'Parcel Pickup Pass (บัตรรับพัสดุ)',
+                  context.tr('Parcel Pickup Pass', 'บัตรรับพัสดุ'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -76,7 +77,7 @@ void showParcelPickupSheet(
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Show this QR code or PIN to the front desk officer',
+                  context.tr('Show this QR code or PIN to the front desk officer', 'แสดง QR Code หรือรหัสนี้ต่อเจ้าหน้าที่เพื่อรับพัสดุ'),
                   style: TextStyle(
                     fontSize: 12,
                     color: DormMateColors.textSecondary.withValues(alpha: 0.9),
@@ -101,7 +102,7 @@ void showParcelPickupSheet(
                   child: Column(
                     children: [
                       Text(
-                        'PICKUP CODE / รหัสรับพัสดุ',
+                        context.tr('PICKUP CODE', 'รหัสรับพัสดุ'),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -134,13 +135,13 @@ void showParcelPickupSheet(
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow('Tracking No.', parcel.trackingNumber, canCopy: true, context: context),
+                      _buildInfoRow(context.tr('Tracking No.', 'เลขพัสดุ'), parcel.trackingNumber, canCopy: true, context: context),
                       Divider(height: 14, color: DormMateColors.divider),
-                      _buildInfoRow('Location', parcel.shelfLocation),
+                      _buildInfoRow(context.tr('Location', 'จุดรับพัสดุ'), parcel.shelfLocation),
                       Divider(height: 14, color: DormMateColors.divider),
-                      _buildInfoRow('Recipient', '${parcel.recipientName} (${parcel.roomNumber})'),
+                      _buildInfoRow(context.tr('Recipient', 'ผู้รับ'), '${parcel.recipientName} (${parcel.roomNumber})'),
                       Divider(height: 14, color: DormMateColors.divider),
-                      _buildInfoRow('Arrived At', parcel.displayArrivedDate),
+                      _buildInfoRow(context.tr('Arrived At', 'เวลาที่มาถึง'), parcel.displayArrivedDate),
                     ],
                   ),
                 ),
@@ -166,19 +167,19 @@ void showParcelPickupSheet(
                           Navigator.pop(ctx);
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Parcel marked as claimed! / รับพัสดุเรียบร้อย'),
-                                backgroundColor: Color(0xFF10B981),
-                                duration: Duration(seconds: 2),
+                              SnackBar(
+                                content: Text(context.tr('Parcel marked as claimed!', 'รับพัสดุเรียบร้อยแล้ว')),
+                                backgroundColor: const Color(0xFF10B981),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           }
                         }
                       },
                       icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
-                      label: const Text(
-                        'Confirm Claimed / รับพัสดุแล้ว',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                      label: Text(
+                        context.tr('Confirm Claimed', 'ยืนยันรับพัสดุแล้ว'),
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -190,10 +191,10 @@ void showParcelPickupSheet(
                       color: const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'This parcel has been claimed / รับพัสดุเรียบร้อยแล้ว',
-                        style: TextStyle(
+                        context.tr('This parcel has been claimed', 'รับพัสดุรายการนี้เรียบร้อยแล้ว'),
+                        style: const TextStyle(
                           color: Color(0xFF64748B),
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
@@ -250,7 +251,7 @@ Widget _buildInfoRow(String label, String value, {bool canCopy = false, BuildCon
                   Clipboard.setData(ClipboardData(text: value));
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('$label copied to clipboard'),
+                      content: Text(context.tr('$label copied to clipboard', 'คัดลอก $label แล้ว')),
                       duration: const Duration(seconds: 2),
                     ),
                   );

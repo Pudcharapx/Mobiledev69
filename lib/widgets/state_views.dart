@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 
 class LoadingView extends StatelessWidget {
   final String? message;
@@ -81,7 +82,7 @@ class ErrorView extends StatelessWidget {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: onRetry,
-                child: const Text('Try Again'),
+                child: Text(context.tr('Try Again', 'ลองใหม่อีกครั้ง')),
               ),
             ],
           ],

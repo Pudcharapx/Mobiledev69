@@ -25,14 +25,22 @@ class Expense {
 
   bool get isPaid => paymentStatus.toLowerCase() == 'paid';
 
-  String get displayMonth {
+  String get displayMonth => displayMonthLocale(false);
+
+  String displayMonthLocale(bool isThai) {
     final parts = billingMonth.split('-');
     if (parts.length != 2) return billingMonth;
-    const months = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+    const monthsEn = ['', 'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthsTh = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
     final m = int.tryParse(parts[1]) ?? 0;
+    final y = int.tryParse(parts[0]) ?? 0;
     if (m >= 1 && m <= 12) {
-      return '${months[m]} ${parts[0]}';
+      if (isThai) {
+        return '${monthsTh[m]} ${y > 0 ? y + 543 : parts[0]}';
+      }
+      return '${monthsEn[m]} ${parts[0]}';
     }
     return billingMonth;
   }

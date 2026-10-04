@@ -35,6 +35,46 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> startOidcLogin() async {
+    _status = AuthStatus.authenticating;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      await _repository.startOidcLogin();
+    } catch (e) {
+      _errorMessage = e.toString();
+      _status = AuthStatus.error;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> handleOidcCallback() async {
+    _status = AuthStatus.authenticating;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repository.handleOidcCallback();
+      if (success) {
+        _currentUserName = await _repository.getCurrentUserName();
+        _currentUserEmail = await _repository.getCurrentUserEmail();
+        _status = AuthStatus.authenticated;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = 'OIDC authentication was not completed.';
+        _status = AuthStatus.error;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      _status = AuthStatus.error;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> login(String username, String password) async {
     _status = AuthStatus.authenticating;
     _errorMessage = null;

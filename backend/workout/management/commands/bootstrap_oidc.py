@@ -21,7 +21,7 @@ class Command(BaseCommand):
         client, created = Client.objects.get_or_create(
             client_id="muscledev-frontend"
         )
-        client.name = "Muscle Heatmap Frontend"
+        client.name = "DormMate Web Frontend"
         client.client_type = "public"
         client.jwt_alg = "RS256"
         # django-oidc-provider stores one URI per line.  Use the model

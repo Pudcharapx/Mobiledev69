@@ -7,13 +7,19 @@ class DormMateColors {
   static bool isDark = false;
 
   // Backgrounds & Surfaces
-  static Color get background => isDark ? const Color(0xFF0B0F19) : const Color(0xFFF5F5F7);
-  static Color get surfaceWhite => isDark ? const Color(0xFF1E293B) : Colors.white;
+  static Color get background => isDark ? const Color(0xFF0B0F19) : const Color(0xFFE8EDF5);
+  static Color get surfaceWhite => isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF3F8);
+  static Color get surfaceElevated => isDark ? const Color(0xFF252D45) : Colors.white;
+
+  // Neu Shadows
+  static Color get neuShadowDark => isDark ? const Color(0xFF0D1422) : const Color(0xFFB0BCCF);
+  static Color get neuShadowLight => isDark ? const Color(0xFF243050) : Colors.white;
 
   // Brand Accents
   static Color get primary => isDark ? const Color(0xFF818CF8) : const Color(0xFF5856D6); // Indigo
   static Color get primaryDark => isDark ? const Color(0xFF6366F1) : const Color(0xFF1C1C1E);
   static Color get accent => isDark ? const Color(0xFF38BDF8) : const Color(0xFFAF52DE); // Purple/Cyan
+  static Color get primarySoft => primary.withValues(alpha: 0.12);
 
   // Typography - High contrast, beautifully readable in both Light & Dark modes!
   static Color get textPrimary => isDark ? const Color(0xFFF8FAFC) : const Color(0xFF111111);

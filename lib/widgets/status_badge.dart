@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 
 class StatusBadge extends StatelessWidget {
   final String status;
@@ -8,6 +9,7 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isThai = context.isThai;
     Color bg;
     Color text;
     Color dot;
@@ -40,6 +42,47 @@ class StatusBadge extends StatelessWidget {
         text = DormMateColors.statusPendingText;
         dot = DormMateColors.statusPending;
         break;
+    }
+
+    String displayLabel = status;
+    if (isThai) {
+      switch (status.toLowerCase()) {
+        case 'in progress':
+        case 'inprogress':
+          displayLabel = 'กำลังซ่อม';
+          break;
+        case 'active':
+          displayLabel = 'ใช้งานอยู่';
+          break;
+        case 'completed':
+        case 'done':
+          displayLabel = 'เสร็จสิ้น';
+          break;
+        case 'paid':
+          displayLabel = 'ชำระแล้ว';
+          break;
+        case 'unpaid':
+          displayLabel = 'ยังไม่ชำระ';
+          break;
+        case 'cancelled':
+          displayLabel = 'ยกเลิกแล้ว';
+          break;
+        case 'error':
+          displayLabel = 'เกิดข้อผิดพลาด';
+          break;
+        case 'ready':
+        case 'ready for pickup':
+          displayLabel = 'พร้อมรับ';
+          break;
+        case 'picked up':
+          displayLabel = 'รับแล้ว';
+          break;
+        case 'pending':
+          displayLabel = 'รอดำเนินการ';
+          break;
+        default:
+          displayLabel = status;
+      }
     }
 
     return Container(
@@ -79,7 +122,7 @@ class StatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 5.5),
           Text(
-            status,
+            displayLabel,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,

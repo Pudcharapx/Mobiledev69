@@ -28,12 +28,23 @@ class ApiService {
 
   // ─── Token storage ──────────────────────────────────────────────────────────
 
-  Future<void> saveToken(String token) =>
-      _storage.write(key: _tokenKey, value: token);
+  Future<void> saveToken(String token) async {
+    await _storage.write(key: _tokenKey, value: token);
+    await _storage.write(key: 'access_token', value: token);
+  }
 
-  Future<String?> loadToken() => _storage.read(key: _tokenKey);
+  Future<String?> loadToken() async {
+    final token = await _storage.read(key: _tokenKey);
+    if (token != null && token.isNotEmpty) return token;
+    return _storage.read(key: 'access_token');
+  }
 
-  Future<void> clearToken() => _storage.delete(key: _tokenKey);
+  Future<void> clearToken() async {
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: 'access_token');
+    await _storage.delete(key: 'id_token');
+    await _storage.delete(key: 'refresh_token');
+  }
 
   Future<Options> _authOptions() async {
     final token = await loadToken();

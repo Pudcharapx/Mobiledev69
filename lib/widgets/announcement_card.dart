@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 import '../models/announcement.dart';
+import '../widgets/neumorphic.dart';
 
 class AnnouncementCard extends StatelessWidget {
   final Announcement announcement;
@@ -14,47 +16,46 @@ class AnnouncementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isUnread = !announcement.isRead;
+
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: NeuContainer(
+        isDark: isDark,
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.84),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.95),
-            width: 1.2,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x08000000),
-              blurRadius: 14,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
+        borderRadius: 18,
+        shadowIntensity: 0.85,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 8,
-              height: 8,
-              margin: const EdgeInsets.only(top: 6, right: 12),
-              decoration: BoxDecoration(
-                color: announcement.isRead
-                    ? DormMateColors.textDisabled
-                    : DormMateColors.primary,
-                shape: BoxShape.circle,
-                boxShadow: announcement.isRead
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: DormMateColors.primary.withValues(alpha: 0.5),
-                          blurRadius: 6,
-                          spreadRadius: 1,
-                        ),
-                      ],
+            // Unread indicator dot
+            Padding(
+              padding: const EdgeInsets.only(top: 6, right: 12),
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: isUnread
+                      ? const LinearGradient(
+                          colors: NeuColors.primaryGradient,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: isUnread ? null : DormMateColors.textDisabled.withValues(alpha: 0.4),
+                  boxShadow: isUnread
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF667EEA).withValues(alpha: 0.50),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ]
+                      : null,
+                ),
               ),
             ),
             Expanded(
@@ -65,33 +66,51 @@ class AnnouncementCard extends StatelessWidget {
                     announcement.title,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: announcement.isRead
-                          ? FontWeight.w500
-                          : FontWeight.w700,
+                      fontWeight: isUnread ? FontWeight.w700 : FontWeight.w500,
                       color: DormMateColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
                     announcement.summary,
                     style: TextStyle(
                       fontSize: 12,
                       color: DormMateColors.textSecondary,
+                      height: 1.4,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    announcement.displayDate,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: DormMateColors.textTertiary,
-                    ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time_rounded,
+                        size: 11,
+                        color: DormMateColors.textTertiary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        announcement.displayDate,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: DormMateColors.textTertiary,
+                        ),
+                      ),
+                      if (isUnread) ...[
+                        const SizedBox(width: 10),
+                        NeuBadge(
+                          text: context.tr('NEW', 'ใหม่'),
+                          color: const Color(0xFF667EEA),
+                          isDark: isDark,
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             Icon(
               Icons.chevron_right_rounded,
               color: DormMateColors.textDisabled,

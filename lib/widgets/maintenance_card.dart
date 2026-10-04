@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../core/constants/dormmate_constants.dart';
+import '../core/localization/language_service.dart';
 import '../models/maintenance_request.dart';
+import '../widgets/neumorphic.dart';
 import 'status_badge.dart';
 
 class MaintenanceCard extends StatelessWidget {
@@ -14,6 +16,27 @@ class MaintenanceCard extends StatelessWidget {
     this.onTap,
     this.onCancel,
   });
+
+  String _getCategoryLabel(String category, bool isThai) {
+    if (!isThai) return category;
+    switch (category.toLowerCase()) {
+      case 'air conditioner':
+        return 'เครื่องปรับอากาศ';
+      case 'water':
+      case 'bathroom':
+        return 'ระบบประปา / ห้องน้ำ';
+      case 'electrical':
+        return 'ระบบไฟฟ้า';
+      case 'furniture':
+        return 'เฟอร์นิเจอร์';
+      case 'internet':
+        return 'อินเทอร์เน็ต';
+      case 'cleaning':
+        return 'ทำความสะอาด';
+      default:
+        return category;
+    }
+  }
 
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
@@ -35,70 +58,47 @@ class MaintenanceCard extends StatelessWidget {
     }
   }
 
-  Color _getCategoryColor(String category) {
+  List<Color> _getCategoryGradient(String category) {
     switch (category.toLowerCase()) {
       case 'air conditioner':
-        return DormMateColors.primary;
+        return NeuColors.accentGradient;
       case 'water':
       case 'bathroom':
-        return const Color(0xFF007AFF);
+        return NeuColors.blueGradient;
       case 'electrical':
-        return const Color(0xFFFF9500);
+        return NeuColors.warmGradient;
+      case 'furniture':
+        return const [Color(0xFF8B5CF6), Color(0xFFA78BFA)];
+      case 'internet':
+        return NeuColors.greenGradient;
       default:
-        return DormMateColors.textSecondary;
+        return NeuColors.primaryGradient;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final icon = _getCategoryIcon(request.category);
-    final color = _getCategoryColor(request.category);
+    final gradient = _getCategoryGradient(request.category);
 
-    Widget content = Container(
+    Widget content = NeuContainer(
+      isDark: isDark,
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.84),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.95),
-          width: 1.2,
-        ),
-        boxShadow: [
-          const BoxShadow(
-            color: Color(0x09000000),
-            blurRadius: 14,
-            offset: Offset(0, 4),
-          ),
-          BoxShadow(
-            color: color.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      borderRadius: 18,
+      shadowIntensity: 0.85,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withValues(alpha: 0.16),
-                  color.withValues(alpha: 0.06),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(13),
-              border: Border.all(
-                color: color.withValues(alpha: 0.22),
-                width: 1,
-              ),
-            ),
-            child: Icon(icon, color: color, size: 21),
+          // Category icon with gradient
+          NeuIconBox(
+            icon: icon,
+            iconColor: gradient.first,
+            isDark: isDark,
+            gradientColors: gradient,
+            size: 46,
+            iconSize: 22,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -109,18 +109,18 @@ class MaintenanceCard extends StatelessWidget {
                   request.title,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: DormMateColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        '${request.category} · ${request.displayDate}',
+                        '${_getCategoryLabel(request.category, context.isThai)} · ${request.displayDate}',
                         style: TextStyle(
                           fontSize: 12,
                           color: DormMateColors.textTertiary,
@@ -131,30 +131,12 @@ class MaintenanceCard extends StatelessWidget {
                     ),
                     if (request.urgency != 'Normal') ...[
                       const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: request.urgency == 'Emergency'
-                              ? const Color(0xFFFFEBEE)
-                              : const Color(0xFFFFF3E0),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: request.urgency == 'Emergency'
-                                ? const Color(0xFFFFCDD2)
-                                : const Color(0xFFFFE0B2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          request.urgency,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: request.urgency == 'Emergency'
-                                ? const Color(0xFFD32F2F)
-                                : const Color(0xFFE65100),
-                          ),
-                        ),
+                      NeuBadge(
+                        text: context.tr(request.urgency, request.urgency == 'Emergency' ? 'ฉุกเฉิน' : (request.urgency == 'High' ? 'เร่งด่วน' : 'ปกติ')),
+                        color: request.urgency == 'Emergency'
+                            ? DormMateColors.statusError
+                            : DormMateColors.statusPending,
+                        isDark: isDark,
                       ),
                     ],
                   ],
@@ -163,7 +145,17 @@ class MaintenanceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          StatusBadge(status: request.status),
+          Column(
+            children: [
+              StatusBadge(status: request.status),
+              const SizedBox(height: 4),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: DormMateColors.textDisabled,
+                size: 18,
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -177,19 +169,23 @@ class MaintenanceCard extends StatelessWidget {
           padding: const EdgeInsets.only(right: 20),
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
-            color: DormMateColors.statusErrorBg,
+            gradient: const LinearGradient(
+              colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
             borderRadius: BorderRadius.circular(DormMateDimens.radiusMd),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.delete_outline, color: DormMateColors.statusErrorText),
+              const Icon(Icons.delete_outline, color: Colors.white),
               const SizedBox(width: 4),
               Text(
-                'Cancel',
-                style: TextStyle(
-                  color: DormMateColors.statusErrorText,
-                  fontWeight: FontWeight.w600,
+                context.tr('Cancel', 'ยกเลิก'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
                   fontSize: 13,
                 ),
               ),
@@ -203,19 +199,19 @@ class MaintenanceCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(DormMateDimens.radiusLg),
               ),
-              title: const Text('Cancel Request'),
-              content: const Text(
-                'Are you sure you want to cancel this maintenance request?',
+              title: Text(context.tr('Cancel Request', 'ยกเลิกคำขอ')),
+              content: Text(
+                context.tr('Are you sure you want to cancel this maintenance request?', 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำขอแจ้งซ่อมนี้?'),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Keep'),
+                  child: Text(context.tr('Keep', 'คงไว้')),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
                   child: Text(
-                    'Cancel Request',
+                    context.tr('Cancel Request', 'ยืนยันยกเลิก'),
                     style: TextStyle(color: DormMateColors.statusErrorText),
                   ),
                 ),

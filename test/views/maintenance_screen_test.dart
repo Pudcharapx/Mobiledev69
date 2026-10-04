@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:project/models/maintenance_request.dart';
 import 'package:project/viewmodels/maintenance_viewmodel.dart';
 import 'package:project/views/maintenance/maintenance_screen.dart';
+import 'package:project/widgets/neumorphic.dart';
 import '../fake_repositories/fake_maintenance_repository.dart';
 
 void main() {
@@ -46,6 +47,12 @@ void main() {
 
     // Verify FloatingActionButton exists with icon
     expect(find.byIcon(Icons.add_rounded), findsNWidgets(2)); // 1 in AppBar, 1 in FAB
+
+    // Verify FAB is compact and not full screen width
+    expect(find.text('New Request'), findsOneWidget);
+    final neuButtonSize = tester.getSize(find.byType(NeuButton));
+    expect(neuButtonSize.width, lessThan(250));
+    expect(neuButtonSize.width, greaterThan(80));
 
     // Verify request item is displayed
     expect(find.text('AC leaking water'), findsOneWidget);

@@ -1,9 +1,13 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../core/auth/auth_service.dart' as core_auth;
+import '../core/auth/oidc_config.dart';
+import '../core/auth/token_storage.dart';
 import 'api_service.dart';
 
 class AuthService {
   final ApiService _apiService;
   final FlutterSecureStorage _storage;
+  final core_auth.AuthService _coreAuth;
 
   static const _userKey = 'dormmate_user_name';
   static const _emailKey = 'dormmate_user_email';
@@ -11,8 +15,14 @@ class AuthService {
   AuthService({
     required ApiService apiService,
     FlutterSecureStorage? storage,
+    core_auth.AuthService? coreAuth,
   })  : _apiService = apiService,
-        _storage = storage ?? const FlutterSecureStorage();
+        _storage = storage ?? const FlutterSecureStorage(),
+        _coreAuth = coreAuth ??
+            core_auth.AuthService(
+              config: OidcConfig.defaultConfig(),
+              tokenStorage: TokenStorage(storage: storage),
+            );
 
   Future<bool> login(String username, String password) async {
     try {
@@ -40,8 +50,40 @@ class AuthService {
     }
   }
 
+  /// Initiate OIDC Authorization Code Flow via browser redirect to Django OIDC Server
+  Future<void> startOidcLogin() async {
+    await _coreAuth.startLogin();
+  }
+
+  /// Process callback from OIDC Server upon successful authorization redirect
+  Future<bool> handleOidcCallback() async {
+    try {
+      final session = await _coreAuth.handleCallback();
+      if (session != null) {
+        final token = await _storage.read(key: 'access_token');
+        if (token != null) {
+          await _apiService.saveToken(token);
+        }
+        final name = session.name;
+        final displayName = (name != null && name.isNotEmpty)
+            ? name
+            : (session.username.isNotEmpty ? session.username : 'Resident');
+        await _storage.write(key: _userKey, value: displayName);
+        final email = session.email;
+        if (email != null && email.isNotEmpty) {
+          await _storage.write(key: _emailKey, value: email);
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await _apiService.clearToken();
+    await _coreAuth.logout();
     await _storage.delete(key: _userKey);
     await _storage.delete(key: _emailKey);
   }
@@ -59,3 +101,4 @@ class AuthService {
     return _storage.read(key: _emailKey);
   }
 }
+

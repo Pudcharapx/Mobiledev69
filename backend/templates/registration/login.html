@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign in | Muscle Heatmap</title>
+  <title>Sign in | DormMate</title>
   <style>
     :root { color-scheme: dark; font-family: Arial, sans-serif; }
     body { align-items: center; background: #111827; display: flex; justify-content: center; margin: 0; min-height: 100vh; }
@@ -12,14 +12,15 @@
     p { color: #9ca3af; line-height: 1.5; margin: 0 0 26px; }
     label { color: #e5e7eb; display: block; font-size: 14px; font-weight: 600; margin: 16px 0 7px; }
     input { background: #111827; border: 1px solid #4b5563; border-radius: 8px; box-sizing: border-box; color: #f9fafb; font-size: 16px; padding: 11px 12px; width: 100%; }
-    button { background: #22c55e; border: 0; border-radius: 8px; color: #052e16; cursor: pointer; font-size: 16px; font-weight: 700; margin-top: 26px; padding: 12px; width: 100%; }
+    button { background: #6366f1; border: 0; border-radius: 8px; color: #ffffff; cursor: pointer; font-size: 16px; font-weight: 700; margin-top: 26px; padding: 12px; width: 100%; }
+    button:hover { background: #4f46e5; }
     .error { background: #451a1a; border: 1px solid #b91c1c; border-radius: 8px; color: #fecaca; margin-bottom: 16px; padding: 10px 12px; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Muscle Heatmap</h1>
-    <p>Sign in to continue to your workout dashboard.</p>
+    <h1>DormMate</h1>
+    <p>Sign in with your resident account (e.g. test / 1234 or demouser / demo12345).</p>
     {% if form.errors %}<div class="error">Your username or password is incorrect.</div>{% endif %}
     <form method="post">
       {% csrf_token %}
